@@ -88,32 +88,46 @@
         type: "webgazer-init-camera",
       };
 
+      var calibration_instructions = {
+        type: "html-keyboard-response",
+        stimulus: `
+      <p>Great! Now the eye tracker will be calibrated to translate the image of your eyes from the webcam to a location on your screen.</p>
+      <p>To do this, you need to click a series of dots.</p>
+      <p>Keep your head still, and click on each dot as it appears. Look at the dot as you click it.</p>
+      <p>Press spacebar to start.</p>
+    `,
+        choices: ["spacebar"],
+        post_trial_gap: 1000,
+      };
+
       var calibration = {
         type: "webgazer-calibrate",
-        calibration_points: [
-          [10, 10],
-          [10, 50],
-          [10, 90],
-          [50, 10],
-          [50, 50],
-          [50, 90],
-          [90, 10],
-          [90, 50],
-          [90, 90],
-        ],
-        repetitions_per_point: 1,
         randomize_calibration_order: true,
+      };
+
+      var validation_instructions = {
+        type: "html-keyboard-response",
+        stimulus: `
+      <p>Let's see how accurate the eye tracking is. </p>
+      <p>Keep your head still, and move your eyes to focus on each dot as it appears.</p>
+      <p>You do not need to click on the dots. Just move your eyes to look at the dots.</p>
+      <p>Press spacebar to start.</p>
+    `,
+        choices: ["spacebar"],
+        post_trial_gap: 1000,
       };
 
       var validation = {
         type: "webgazer-validate",
         validation_points: [
-          [-200, -200],
-          [-200, 200],
-          [200, -200],
-          [200, 200],
+          [25, 25],
+          [25, 75],
+          [75, 25],
+          [75, 75],
+          [50, 50],
         ],
-        validation_point_coordinates: "center-offset-pixels",
+        validation_point_coordinates: "percent",
+        randomize_validation_order: true,
         show_validation_data: true,
       };
 
@@ -461,7 +475,9 @@
         timeline: [
           init_camera,
           welcomeFullScreen,
+          calibration_instructions,
           calibration,
+          validation_instructions,
           validation,
           seqGambleInstruction,
           seqGambleQuiz,
