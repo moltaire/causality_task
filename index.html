@@ -65,6 +65,8 @@
     stimulus: '<p style="font-size:40px;">+</p>',
     choices: jsPsych.NO_KEYS,
     trial_duration: fixationDuration,
+    extensions: [{ type: "webgazer" }],
+    on_start: () => (document.body.style.cursor = "none"),
   };
 
   /* Welcome and Full Screen */
@@ -109,7 +111,7 @@
   var calibration = {
     type: "webgazer-calibrate",
     randomize_calibration_order: true,
-    calibration_mode: "view"
+    calibration_mode: "view",
   };
 
   var validation_instructions = {
@@ -121,9 +123,6 @@
     `,
     choices: [" "],
     post_trial_gap: 1000,
-    on_start: function() {
-      jsPsych.extensions.webgazer.showPredictions()
-    }
   };
 
   var validation = {
@@ -157,6 +156,7 @@
         </div>`,
     post_trial_gap: 1000,
     choices: [" "],
+    on_start: () => (document.body.style.cursor = "none"),
   };
 
   /* Comprehension quiz */
@@ -215,6 +215,7 @@
     on_finish: function () {
       reminder_pages = [];
     },
+    on_start: () => (document.body.style.cursor = "none"),
   };
 
   // Put the quiz procedure together
@@ -264,7 +265,7 @@
       console.log("Trial data:", data);
       trialCounter++;
     },
-    extensions: { type: "webgazer" },
+    extensions: [{ type: "webgazer" }],
   };
 
   // Break screen procedure (break + get-ready countdown)
@@ -468,11 +469,11 @@
         You will then be redirected back to Prolific, where this study will be marked as completed.</p>`,
     on_start: () => (document.body.style.cursor = "auto"),
     on_finish: function (data) {
-      if (data.button_pressed == 0) {
+      if (data.response == 0) {
         console.log("Data download request as .csv ");
         jsPsych.data.get().localSave("csv", "decision-experiment.csv");
       }
-      if (data.button_pressed == 1) {
+      if (data.response == 1) {
         console.log("Data download request as .json");
         jsPsych.data.get().localSave("json", "decision-experiment.json");
       }
@@ -490,9 +491,9 @@
       seqGambleInstruction,
       seqGambleQuiz,
       seqGamblePractice,
-      seqGambleMainTaskBlock1,
-      seqGambleMainTaskBlock2,
-      realization,
+      // seqGambleMainTaskBlock1,
+      // seqGambleMainTaskBlock2,
+      // realization,
       debriefing,
     ],
     on_finish: function () {
