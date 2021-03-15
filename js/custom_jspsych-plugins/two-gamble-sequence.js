@@ -56,18 +56,6 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         default: 500,
         description: "Duration for which the feedback frame is shown (ms).",
       },
-      doEyeTracking: {
-        type: jsPsych.plugins.parameterType.BOOL,
-        pretty_name: "eye-tracking",
-        default: true,
-        description: "Whether to do the eye tracking during this trial.",
-      },
-      showPredictionPoints: {
-        type: jsPsych.plugins.parameterType.BOOL,
-        pretty_name: "webgazer-prediction-point",
-        default: true,
-        description: "Whether to show the current webgazer-prediction.",
-      },
       feedbackColor: {
         type: jsPsych.plugins.parameterType.STR,
         pretty_name: "Feedback color",
@@ -274,12 +262,6 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
 
     // function to end trial when it is time
     var end_trial = function () {
-      if (trial.doEyeTracking) {
-        webgazer.showPredictionPoints(false);
-        webgazer.pause(); // pause the webgazer before you save the data, this is optional
-        clearInterval(eye_tracking_interval);
-      } // clear the time interval before you save the data, so next time you use this trial, the timer will start from beginning.
-
       // kill any remaining setTimeout handlers
       jsPsych.pluginAPI.clearAllTimeouts();
 
@@ -298,7 +280,6 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         mR: trial.mR,
         phase: trial.stimulus.phase,
         condition: trial.stimulus.condition,
-        eyeData: JSON.stringify(eyeData),
         sequence: trial.sequence,
         choice: choice,
         chosenP: chosenP,
@@ -395,29 +376,6 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     var radius = gambleCanvas.width / 15;
     var height = 2 * radius;
     var width = (radius * Math.PI) / 2; // This way, the area of the barplot and the pie chart are identical
-
-    // Start eyetracking
-    var eyeData = { history: [] };
-    if (trial.doEyeTracking) {
-      webgazer.resume();
-      webgazer.showVideo(false);
-      webgazer.showPredictionPoints(trial.showPredictionPoints);
-      webgazer.showFaceOverlay(false);
-      webgazer.showFaceFeedbackBox(false);
-      var starttime = performance.now();
-      var eye_tracking_interval = setInterval(function () {
-        var pos = webgazer.getCurrentPrediction();
-        if (pos) {
-          var relativePosX = pos.x / screen.width;
-          var relativePosY = pos.y / screen.height;
-          eyeData.history.push({
-            "relative-x": relativePosX,
-            "relative-y": relativePosY,
-            "elapse-time": performance.now() - starttime,
-          });
-        }
-      }, 20);
-    }
 
     // Draw stimuli
     var i;
