@@ -101,7 +101,7 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     },
   };
 
-  plugin.trial = async function (display_element, trial) {
+  plugin.trial = function (display_element, trial) {
     // Randomize item positions
     var stimuli = [
       [trial.stimulus.p0, trial.stimulus.m0],
@@ -377,53 +377,73 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     var height = 2 * radius;
     var width = (radius * Math.PI) / 2; // This way, the area of the barplot and the pie chart are identical
 
-    // Draw stimuli
-    var i;
-    for (i = 0; i < trial.sequence.durations.length; i++) {
-      // Draw
-      drawStims(i);
-      // Wait
-      await new Promise((r) => setTimeout(r, trial.sequence.durations[i]));
-      // Clear canvas
-      ctx.clearRect(0, 0, gambleCanvas.width, gambleCanvas.height);
-    }
+    // Draw stimuli in sequence and prompt choice afterwards
+    let i = -1;
+    function presentSequence() {
+      i += 1;
+      if (i < (trial.sequence.durations.length)) {
+        // Clear canvas
+        ctx.clearRect(0, 0, gambleCanvas.width, gambleCanvas.height);
+        drawStims(i)
+        jsPsych.pluginAPI.setTimeout(presentSequence, trial.sequence.durations[i])
+      } else {
+        // Draw choice prompt
+        // Clear canvas
+        ctx.clearRect(0, 0, gambleCanvas.width, gambleCanvas.height);
+        ctx.font = "60px sans-serif";
+        ctx.fillStyle = trial.feedbackColor;
+        ctx.textAlign = "center";
+        ctx.fillText(
+          trial.choicePrompt,
+          gambleCanvas.width / 2,
+          gambleCanvas.height / 2
+        );
+        for (alt = 0; alt < 2; alt++) {
+          ctx.strokeRect(
+            xpos[alt] - boxWidthScale * radius,
+            gambleCanvas.height * 0.1,
+            2 * boxWidthScale * radius,
+            gambleCanvas.height * 0.8
+          );
+        }
+        // start the response listener
+        if (trial.choices != jsPsych.NO_KEYS) {
+          var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
+            callback_function: after_response,
+            valid_responses: trial.choices,
+            rt_method: "performance",
+            persist: false,
+            allow_held_key: false,
+          });
+        }
 
-    for (alt = 0; alt < 2; alt++) {
-      ctx.strokeRect(
-        xpos[alt] - boxWidthScale * radius,
-        gambleCanvas.height * 0.1,
-        2 * boxWidthScale * radius,
-        gambleCanvas.height * 0.8
-      );
-    }
+        // end trial if choiceTimeout is set
+        if (trial.choiceTimeout !== null) {
+          jsPsych.pluginAPI.setTimeout(function () {
+            end_trial();
+          }, trial.choiceTimeout);
+        }
 
-    // Draw choice prompt
-    ctx.font = "60px sans-serif";
-    ctx.fillStyle = trial.feedbackColor;
-    ctx.textAlign = "center";
-    ctx.fillText(
-      trial.choicePrompt,
-      gambleCanvas.width / 2,
-      gambleCanvas.height / 2
-    );
-
-    // start the response listener
-    if (trial.choices != jsPsych.NO_KEYS) {
-      var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
-        callback_function: after_response,
-        valid_responses: trial.choices,
-        rt_method: "performance",
-        persist: false,
-        allow_held_key: false,
-      });
+      }
     }
+    presentSequence()
 
-    // end trial if choiceTimeout is set
-    if (trial.choiceTimeout !== null) {
-      jsPsych.pluginAPI.setTimeout(function () {
-        end_trial();
-      }, trial.choiceTimeout);
-    }
+
+
+
+    // var i;
+    // for (i = 0; i < trial.sequence.durations.length; i++) {
+    //   // Draw
+    //   drawStims(i);
+    //   // Wait
+    //   await new Promise((r) => setTimeout(r, trial.sequence.durations[i]));
+    //   // Clear canvas
+    //   ctx.clearRect(0, 0, gambleCanvas.width, gambleCanvas.height);
+    // }
+
+
+
+
   };
 
   return plugin;
