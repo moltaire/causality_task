@@ -96,7 +96,7 @@
       <p>Keep your head still, and click on each dot as it appears. Look at the dot as you click it.</p>
       <p>Press spacebar to start.</p>
     `,
-        choices: ["spacebar"],
+        choices: [" "],
         post_trial_gap: 1000,
       };
 
@@ -113,7 +113,7 @@
       <p>You do not need to click on the dots. Just move your eyes to look at the dots.</p>
       <p>Press spacebar to start.</p>
     `,
-        choices: ["spacebar"],
+        choices: [" "],
         post_trial_gap: 1000,
       };
 
@@ -148,7 +148,7 @@
         <p>Press the <strong><em>SPACE BAR</em></strong> to continue.</p>
         </div>`,
         post_trial_gap: 1000,
-        choices: ["spacebar"],
+        choices: [" "],
       };
 
       /* Comprehension quiz */
@@ -199,7 +199,7 @@
         type: "instructions",
         show_page_number: true,
         page_label: "Reminder",
-        key_forward: "spacebar",
+        key_forward: " ",
         pages: function () {
           return reminder_pages;
         },
@@ -270,7 +270,7 @@
             <p>Great job! Take a short break to make sure that you are focused for the next set of trials, but try to keep your head in position.</p>
             <p>Press the <strong><em>SPACE BAR</em></strong> to continue immediately.</p>
             </div>`,
-            choices: ["spacebar"],
+            choices: [" "],
             trial_duration: withinBlockBreakDuration,
           },
           {
@@ -325,7 +325,7 @@
             Place your fingers on these keys now.</p>
             <p>Press <strong><em>SPACE BAR</em></strong> to start practice.</p>
             </div>`,
-            choices: ["spacebar"],
+            choices: [" "],
           },
           {
             timeline: [fixation, seqGambleChoice],
@@ -341,7 +341,7 @@
             <p>If everything is clear, press <strong><em>SPACE BAR</em></strong> to start the main task.</p>
             <p>To repeat practice, press <strong><em>R</em></strong>.</p>
             </div>`,
-            choices: ["spacebar", "R"],
+            choices: [" ", "R"],
             on_finish: function (data) {
               if (jsPsych.pluginAPI.compareKeys(data.key_press, "R")) {
                 repeatPractice = true;
@@ -366,7 +366,7 @@
             <p align="justify">Get ready for the main task. You will perform two blocks of this task with breaks in between. Please remember to keep your head still, and focus on the red dots between trials. Good luck!</p>
             <p>Press <strong><em>SPACE BAR</em></strong> to start the main task.</p>
             </div>`,
-            choices: ["spacebar"],
+            choices: [" "],
             post_trial_gap: 2000,
           },
           {
@@ -435,7 +435,7 @@
           },
           {
             type: "html-keyboard-response",
-            choices: ["spacebar"],
+            choices: [" "],
             stimulus: function () {
               return (
                 `<div style="max-width: 800px">
