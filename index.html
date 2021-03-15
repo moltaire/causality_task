@@ -172,7 +172,7 @@
           data.questions = questionSample; // Save questions that were asked
 
           // Count correct responses
-          var responses = JSON.parse(data.responses);
+          var responses = JSON.parse(data.response);
           var i;
           for (i = 0; i < questionSample.length; i++) {
             var response = responses["Q" + i];
