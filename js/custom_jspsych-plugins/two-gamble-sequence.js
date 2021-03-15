@@ -126,8 +126,8 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
 
     //--------Set up Canvas start-------
     var gambleCanvas = document.createElement("canvas");
-    gambleCanvas.width = 0.95 * screen.width;
-    gambleCanvas.height = 0.95 * screen.height;
+    gambleCanvas.width = 0.95 * window.innerWidth;
+    gambleCanvas.height = 0.95 * window.innerHeight;
     display_element.appendChild(gambleCanvas);
 
     function drawPiechart(
@@ -321,13 +321,13 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         chosenM = null;
         choice = null;
       }
-      if (String.fromCharCode(response.key) == trial.choices[0]) {
+      if (jsPsych.pluginAPI.compareKeys(response.key, trial.choices[0])) {
         var xposFeedback = left_xpos;
         choice = leftItem;
         chosenP = trial.pL;
         chosenM = trial.mL;
       } else {
-        if (String.fromCharCode(response.key) == trial.choices[1]) {
+        if (jsPsych.pluginAPI.compareKeys(response.key, trial.choices[1])) {
           var xposFeedback = right_xpos;
           choice = 1 - leftItem;
           chosenP = trial.pR;
