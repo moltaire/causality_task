@@ -118,10 +118,11 @@ jsPsych.plugins["webgazer-calibrate"] = (function () {
     }
 
     function calibration_display_gaze_only(pt) {
-      var pt_html = `<div id="calibration-point" style="width:${trial.point_size}px; height:${trial.point_size}px; border-radius:${trial.point_size}px; border: 1px solid ${trial.point_border_color}; background-color: ${trial.point_background_color}; position: absolute; left:${pt[0]}%; top:${pt[1]}%;"></div>`;
+      var pt_html = `<div id="calibration-point" style="width:${trial.point_size}px; height:${trial.point_size}px; border-radius:${trial.point_size}px; border: 1px solid ${trial.point_border_color}; background-color: ${trial.point_background_color}; position: absolute; left:${pt[0]}%; top:${pt[1]}%;"><div id="calibration-countdown" style="color: ${trial.point_border_color}; line-height:${trial.point_size}px; text-align:center"></div></div>`;
       wg_container.innerHTML = pt_html;
 
       var pt_dom = wg_container.querySelector("#calibration-point");
+      var countdown_dom = wg_container.querySelector("#calibration-countdown");
 
       if (trial.calibration_mode == "click") {
         pt_dom.style.cursor = "pointer";
@@ -138,9 +139,16 @@ jsPsych.plugins["webgazer-calibrate"] = (function () {
         var pt_start_cal = performance.now() + trial.time_to_saccade;
         var pt_finish =
           performance.now() + trial.time_to_saccade + trial.time_per_point;
-
+        var started = false;
         requestAnimationFrame(function watch_dot() {
           if (performance.now() > pt_start_cal) {
+            if (!started) {
+              started = true;
+              countdown_dom.innerHTML = trial.time_per_point / 1000;
+              counter = setInterval(function () {
+                countdown_dom.innerHTML = countdown_dom.innerHTML - 1;
+              }, 1000);
+            }
             jsPsych.extensions["webgazer"].calibratePoint(x, y, "click");
           }
           if (performance.now() < pt_finish) {
@@ -168,6 +176,7 @@ jsPsych.plugins["webgazer-calibrate"] = (function () {
 
       // kill any remaining setTimeout handlers
       jsPsych.pluginAPI.clearAllTimeouts();
+      clearInterval(counter);
 
       // gather the data to store for the trial
       var trial_data = {};
