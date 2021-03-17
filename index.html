@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+
     <!-- Libraries -->
     <script src="js/jspsych-6.3.0/jspsych.js"></script>
     <!-- Plugins -->
@@ -51,6 +53,11 @@
     var timeline = [];
     var trialCounter = 1;
     var repeatPractice = false;
+
+    // Eye tracking parameters
+    calibrationPointSize = 30;
+    calibrationPointDuration = 3000;
+    calibrationTimeToSaccade = 1000;
 
     // Quiz parameters
     var nQuestions = 3; // How many questions from the pool to ask
@@ -117,8 +124,9 @@
       randomize_calibration_order: true,
       calibration_mode: "view",
       point_background_color: "white",
-      point_size: 20,
-      time_per_point: 3000,
+      point_size: calibrationPointSize,
+      time_per_point: calibrationPointDuration,
+      time_to_saccade: calibrationTimeToSaccade,
     };
 
     var validation_instructions = {
@@ -145,7 +153,9 @@
       randomize_validation_order: true,
       show_validation_data: true,
       point_background_color: "white",
-      point_size: 20,
+      point_size: calibrationPointSize,
+      validation_duration: 3000,
+      time_to_saccade: calibrationTimeToSaccade,
     };
 
     /* Sequential presentation gamble choice task */

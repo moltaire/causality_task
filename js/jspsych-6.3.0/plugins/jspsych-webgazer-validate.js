@@ -112,6 +112,7 @@ jsPsych.plugins["webgazer-validate"] = (function () {
       wg_container.innerHTML = pt_html;
 
       var pt_dom = wg_container.querySelector(".validation-point");
+      var countdown_dom = wg_container.querySelector("#validation-countdown");
 
       var br = pt_dom.getBoundingClientRect();
       var x = br.left + br.width / 2;
@@ -121,9 +122,17 @@ jsPsych.plugins["webgazer-validate"] = (function () {
       var pt_finish = pt_start_val + trial.validation_duration;
 
       var pt_data = [];
+      var countdown_started = false;
 
       requestAnimationFrame(function watch_dot() {
         if (performance.now() > pt_start_val) {
+          if (!countdown_started) {
+            countdown_started = true;
+            countdown_dom.innerHTML = trial.validation_duration / 1000;
+            counter = setInterval(function () {
+              countdown_dom.innerHTML = countdown_dom.innerHTML - 1;
+            }, 1000);
+          }
           jsPsych.extensions["webgazer"]
             .getCurrentPrediction()
             .then(function (prediction) {
@@ -138,6 +147,8 @@ jsPsych.plugins["webgazer-validate"] = (function () {
           requestAnimationFrame(watch_dot);
         } else {
           trial_data.raw_gaze.push(pt_data);
+          clearInterval(counter);
+          counter = undefined;
           next_validation_point();
         }
       });
@@ -153,7 +164,7 @@ jsPsych.plugins["webgazer-validate"] = (function () {
     }
 
     function drawValidationPoint_PercentMode(x, y) {
-      return `<div class="validation-point" style="width:${trial.point_size}px; height:${trial.point_size}px; border-radius:${trial.point_size}px; border: 1px solid ${trial.point_border_color}; background-color: ${trial.point_background_color}; position: absolute; left:${x}%; top:${y}%;"></div>`;
+      return `<div class="validation-point" style="width:${trial.point_size}px; height:${trial.point_size}px; border-radius:${trial.point_size}px; border: 1px solid ${trial.point_border_color}; background-color: ${trial.point_background_color}; position: absolute; left:${x}%; top:${y}%;"><div id="validation-countdown" style="color: ${trial.point_border_color}; line-height:${trial.point_size}px; text-align:center"></div></div>`;
     }
 
     function drawValidationPoint_CenterOffsetMode(x, y) {
@@ -167,7 +178,9 @@ jsPsych.plugins["webgazer-validate"] = (function () {
         trial.point_size / 2
       }px + ${x}px); top:calc(50% - ${
         trial.point_size / 2
-      }px + ${y}px);"></div>`;
+      }px + ${y}px);"><div id="validation-countdown" style="color: ${
+        trial.point_border_color
+      }; line-height:${trial.point_size}px; text-align:center"></div></div>`;
     }
 
     function drawCircle(target_x, target_y, dx, dy, r) {

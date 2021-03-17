@@ -139,11 +139,11 @@ jsPsych.plugins["webgazer-calibrate"] = (function () {
         var pt_start_cal = performance.now() + trial.time_to_saccade;
         var pt_finish =
           performance.now() + trial.time_to_saccade + trial.time_per_point;
-        var started = false;
+        var countdown_started = false;
         requestAnimationFrame(function watch_dot() {
           if (performance.now() > pt_start_cal) {
-            if (!started) {
-              started = true;
+            if (!countdown_started) {
+              countdown_started = true;
               countdown_dom.innerHTML = trial.time_per_point / 1000;
               counter = setInterval(function () {
                 countdown_dom.innerHTML = countdown_dom.innerHTML - 1;
@@ -154,6 +154,8 @@ jsPsych.plugins["webgazer-calibrate"] = (function () {
           if (performance.now() < pt_finish) {
             requestAnimationFrame(watch_dot);
           } else {
+            clearInterval(counter);
+            counter = undefined;
             next_calibration_point();
           }
         });
