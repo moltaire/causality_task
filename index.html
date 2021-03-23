@@ -458,7 +458,7 @@
               winString = `<h2 style="color:OrangeRed">Unfortunately you did not win a bonus.</h2>`;
             }
             jsPsych.data.addProperties({
-              chosenTrial: chosenTrial,
+              chosenTrial: chosenTrial.condition,
               luckyNumber: luckyNumber,
               wonAmt: wonAmt,
             });
