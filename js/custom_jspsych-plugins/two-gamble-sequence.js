@@ -428,7 +428,7 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         end_trial();
       }, trial.choiceTimeout);
     }
-  };
+
     // // Draw stimuli in sequence and prompt choice afterwards
     // let i = -1;
     // function presentSequence() {
@@ -479,7 +479,6 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     //   }
     // }
     // presentSequence()
-
   };
 
   return plugin;
