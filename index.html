@@ -45,6 +45,7 @@
   <body></body>
   <script>
     debug_nTrialsPerBlock = 2;
+    debug_showValidation = true;
 
     var preload = {
       type: "preload",
@@ -135,7 +136,7 @@
       ],
       validation_point_coordinates: "percent",
       randomize_validation_order: true,
-      show_validation_data: false,
+      show_validation_data: debug_showValidation,
       point_background_color: "white",
       point_size: calibrationPointSize,
       validation_duration: validationPointDuration,
