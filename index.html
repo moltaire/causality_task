@@ -11,6 +11,7 @@
     <script src="js/jspsych-6.3.0/plugins/jspsych-instructions.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-survey-multi-choice.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-fullscreen.js"></script>
+    <script src="js/jspsych-6.3.0/plugins/jspsych-preload.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-call-function.js"></script>
     <script src="js/jspsych-6.3.0/extensions/jspsych-ext-webgazer.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-webgazer-init-camera.js"></script>
@@ -44,6 +45,12 @@
   <body></body>
   <script>
     debug_nTrialsPerBlock = 2;
+
+    var preload = {
+      type: "preload",
+      auto_preload: true,
+    };
+
     /* Welcome and Full Screen */
     var welcomeFullScreen = {
       type: "fullscreen",
@@ -504,6 +511,7 @@
 
     jsPsych.init({
       timeline: [
+        preload,
         welcomeFullScreen,
         init_camera,
         seqGambleInstruction,
