@@ -23,6 +23,10 @@
     <script src="stimuli/conditions.js"></script>
     <script src="stimuli/practice.js"></script>
     <script src="stimuli/quiz.js"></script>
+    <!-- Load experiment settings -->
+    <script src="settings.js"></script>
+    <!-- Load instruction strings -->
+    <script src="instructions/instructions.js"></script>
 
     <link rel="stylesheet" href="js/jspsych-6.3.0/css/jspsych.css" />
     <style>
@@ -39,47 +43,7 @@
 
   <body></body>
   <script>
-    // Experiment settings
-    const fixationDuration = 500; // this is in ms
-    const withinBlockBreakDuration = 30 * 1000; // in ms, too
-    const getReadyDuration = 5 * 1000;
-    const countdownDuration = 3 * 1000;
-    const breakAfter = 41; // how many trials until a break is shown
-    const choiceTimeout = 3000;
-    const feedbackColor = "Gold";
-    const stimBackgroundColor = "#999";
-    const stimForegroundColor = "#DDD";
-    const stimFrameColor = "#DDD";
-    var timeline = [];
-    var trialCounter = 1;
-    var repeatPractice = false;
-
-    // Eye tracking parameters
-    calibrationPointSize = 30;
-    calibrationPointDuration = 3000;
-    calibrationTimeToSaccade = 1000;
-
-    // Quiz parameters
-    var nQuestions = 3; // How many questions from the pool to ask
-    var nCorrectRequired = 3; // How many questions have to be answered correctly
-    var nCorrect = 0;
-    var reminder_pages = [];
-    var questionSample = [];
-    // Draw random questions from the question pool
-    questionSample = jsPsych.randomization.sampleWithoutReplacement(
-      questions,
-      nQuestions
-    );
-
-    var fixation = {
-      type: "html-keyboard-response",
-      stimulus: '<p style="font-size:40px;">+</p>',
-      choices: jsPsych.NO_KEYS,
-      trial_duration: fixationDuration,
-      extensions: [{ type: "webgazer" }],
-      on_start: () => (document.body.style.cursor = "none"),
-    };
-
+    debug_nTrialsPerBlock = 2;
     /* Welcome and Full Screen */
     var welcomeFullScreen = {
       type: "fullscreen",
@@ -87,7 +51,7 @@
         <div style="max-width: 800px">
         <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Welcome</h1>
         <p align="justify">Thank you for choosing to participate in this study. Our aim is to better understand how people make decisions.<br>
-        We are also interested in people's looking behaviour during decision making, therefore this study includes <strong>webcam-based eye tracking</strong>.
+        We are also interested in people's looking behaviour during decision making, therefore this study includes <strong>webcam-based eye tracking</strong>. Please <strong>allow this page to access your webcam, when prompted</strong>. Your video feed is processed locally and is not transmitted.
         The study will take less than 30 minutes to complete. Please assure that you can be focused and undisturbed for this time.
         To make sure the study runs smoothly, please</p>
         <ul>
@@ -95,25 +59,48 @@
         <li style="text-align: left;"><strong>close any other browser tabs </strong>that could produce<strong> popups </strong>or<strong> alerts</strong></li>
         <li style="text-align: left;"><strong>mute </strong>your <strong>cell phone</strong> and make sure that it will not distract you</li>
         </ul>
-        <p align="justify">The study will switch to fullscreen mode when you press the button below. Once this study has started, <strong>please do not exit fullscreen mode</strong>.</p>
         </div>`,
       fullscreen_mode: true,
-      // on_finish: () => (document.body.style.cursor = "none"),
-      button_label: "I'm ready to continue.",
+      button_label: "Switch to fullscreen and continue",
     };
 
     /* Initial Eye tracking setup */
     var init_camera = {
       type: "webgazer-init-camera",
+      instructions: `
+      <div style="max-width: 800px">
+      <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Camera Setup</h1>
+      <p align="justify">Position your head so that the webcam has a good view of your eyes. Use the video in the upper-left corner as a guide. Center your face in the box and look directly towards the camera. The blue dot mask should be stable and flush on your mouth and eyes.
+      <p align='center'><strong>It is important that you try and keep your head reasonably still throughout the experiment, so please take a moment to adjust your setup as needed. Use these tips to achieve a good camera setup:</strong></p>
+      <img width="700px" src="img/camera-setup-tips.png">
+      <p>When your face is centered in the box and the box turns green, you can click to continue.</p>
+    `,
+      on_start: () => (document.body.style.cursor = "auto"),
     };
 
     var calibration_instructions = {
       type: "html-keyboard-response",
       stimulus: `
-      <p>Great! Now the eye tracker will be calibrated to translate the image of your eyes from the webcam to a location on your screen.</p>
+      <div style="max-width: 800px">
+      <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Calibration</h1>
+      <p>Great! Now the eye tracker will be calibrated to translate the image of your eyes from the webcam to a location on your screen.
       <p>To do this, you need to look at a series of dots.</p>
       <p>Keep your head still, and focus your gaze on each dot as it appears.</p>
-      <p>Press SPACE BAR to start.</p>
+      <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
+    `,
+      choices: [" "],
+      post_trial_gap: 1000,
+    };
+
+    var recalibration_instructions = {
+      type: "html-keyboard-response",
+      stimulus: `
+      <div style="max-width: 800px">
+      <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Re-Calibration</h1>
+      <p>Great! Now the eye tracker will be calibrated to translate the image of your eyes from the webcam to a location on your screen.
+      <p>Good job! We quickly need to re-calibrate the eye tracker.
+      <p>Please keep your head still, and focus your gaze on each dot as it appears.</p>
+      <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
     `,
       choices: [" "],
       post_trial_gap: 1000,
@@ -127,17 +114,7 @@
       point_size: calibrationPointSize,
       time_per_point: calibrationPointDuration,
       time_to_saccade: calibrationTimeToSaccade,
-    };
-
-    var validation_instructions = {
-      type: "html-keyboard-response",
-      stimulus: `
-      <p>Let's see how accurate the eye tracking is. </p>
-      <p>Keep your head still, and move your eyes to focus on each dot as it appears.</p>
-      <p>Press SPACE BAR to start.</p>
-    `,
-      choices: [" "],
-      post_trial_gap: 1000,
+      on_start: () => (document.body.style.cursor = "none"),
     };
 
     var validation = {
@@ -151,31 +128,21 @@
       ],
       validation_point_coordinates: "percent",
       randomize_validation_order: true,
-      show_validation_data: true,
+      show_validation_data: false,
       point_background_color: "white",
       point_size: calibrationPointSize,
-      validation_duration: 3000,
+      validation_duration: validationPointDuration,
       time_to_saccade: calibrationTimeToSaccade,
+      on_start: () => (document.body.style.cursor = "none"),
     };
 
     /* Sequential presentation gamble choice task */
     var seqGambleInstruction = {
-      type: "html-keyboard-response",
-      stimulus: `
-        <div style="max-width: 800px">
-        <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Decision-making task</h1>
-        <p align="justify">
-        In the next trials, you will make choices between two risky lotteries.
-        Each lottery describes the prospect to win an amount between £0.1 and £10 with some probability. The possible winning amount is illustrated as a filled rectangular bar. The more filled it is, the higher the possible winning <strong>amount</strong>. The <strong>probability</strong> of winning is illustrated with a pie chart. The more it is filled, the higher the probability of winning this lottery's amount.<br><br>
-        Information over the two lotteries is shown to you in a rapid sequential presentation.
-        After the presentation sequence, you will be prompted to make a choice <strong>within ${
-          choiceTimeout / 1000
-        } seconds</strong>!<br>
-        <p align="justify">After you completed a total of 164 choice trials, the computer will randomly determine one of the lotteries you chose and play it out - according to its winning probability and amount - as a <strong>bonus payment</strong>. This way, you should ideally treat every choice as if it was relevant to determine your chance for a bonus payment.</p>
-        <p>Press the <strong><em>SPACE BAR</em></strong> to continue.</p>
-        </div>`,
+      type: "instructions",
+      pages: taskInstructions,
       post_trial_gap: 1000,
-      choices: [" "],
+      key_forward: " ",
+      key_backward: "b",
       on_start: () => (document.body.style.cursor = "none"),
     };
 
@@ -185,7 +152,7 @@
       preamble: `
         <div style="max-width: 800px">
         <h1><img src="icons/how-to_inv.png", width="50"><br><br>Comprehension check</h1>
-        <p>Please answer these questions to make sure that you understood the instructions. You will be able to re-read them if you get something wrong.</p>
+        <p>Please answer these questions to make sure that you understood the instructions.</p>
         </div>`,
       questions: function () {
         return questionSample;
@@ -252,6 +219,15 @@
       loop_function: function () {
         return nCorrect < nCorrectRequired;
       },
+    };
+
+    var fixation = {
+      type: "html-keyboard-response",
+      stimulus: '<p style="font-size:40px;">+</p>',
+      choices: jsPsych.NO_KEYS,
+      trial_duration: fixationDuration,
+      extensions: [{ type: "webgazer" }],
+      on_start: () => (document.body.style.cursor = "none"),
     };
 
     /* Sequential gamble presentation task */
@@ -353,6 +329,7 @@
             <p align="justify">Now you will perform a couple of practice trials that look just like the ones in the main task, but don't count for the possible bonus winning.</p>
             Press the <strong>F</strong> key to choose the left gamble and the <strong>J</strong> key to choose the right gamble.<br>
             Place your fingers on these keys now.</p>
+            <p>Please re-center your gaze on the "<strong>+</strong>" between trials.
             <p>Press <strong><em>SPACE BAR</em></strong> to start practice.</p>
             </div>`,
           choices: [" "],
@@ -405,6 +382,10 @@
             return trial.block == 0;
           }),
           randomize_order: true,
+          sample: {
+            type: "without-replacement",
+            size: debug_nTrialsPerBlock,
+          },
         },
       ],
     };
@@ -417,6 +398,10 @@
             return trial.block == 1;
           }),
           randomize_order: true,
+          sample: {
+            type: "without-replacement",
+            size: debug_nTrialsPerBlock,
+          },
         },
       ],
     };
@@ -447,8 +432,8 @@
               ).toFixed(
                 2
               )}. The computer then played this lottery out and determined the result:</p>`;
-              var rndNmbr = Math.random();
-              if (rndNmbr < chosenTrial.chosenP) {
+              var luckyNumber = Math.random();
+              if (luckyNumber < chosenTrial.chosenP) {
                 wonAmt = chosenTrial.chosenP;
                 winString = `<h2 style="color:ForestGreen">Congratulations! You won an additional £${(
                   chosenTrial.chosenM * 10
@@ -461,6 +446,11 @@
               chosenGambleString = `<p align="justify">The computer randomly chose a trial where you did not respond in time.</p>`;
               winString = `<h2 style="color:OrangeRed">Unfortunately you did not win a bonus.</h2>`;
             }
+            jsPsych.data.addProperties({
+              chosenTrial: chosenTrial,
+              luckyNumber: luckyNumber,
+              wonAmt: wonAmt,
+            });
           },
         },
         {
@@ -486,7 +476,7 @@
         <div style="max-width: 800px">
         <h1><img src="icons/race_inv.png", width="50"/><br><br>Study completed!</h1>
         <p align="justify">Thank you for your participation! In this study, we were specifically interested in how the order and duration of information presentation influences choices.<br>
-        If you'd like to download a copy of the data to explore, click the format you'd like below.<br>
+        If you'd like to download a copy of the data to explore, click the format you prefer below.<br>
         You will then be redirected back to Prolific, where this study will be marked as completed.</p>`,
       on_start: () => (document.body.style.cursor = "auto"),
       on_finish: function (data) {
@@ -503,18 +493,20 @@
 
     jsPsych.init({
       timeline: [
-        init_camera,
         welcomeFullScreen,
-        calibration_instructions,
-        calibration,
-        validation_instructions,
-        validation,
         seqGambleInstruction,
         seqGambleQuiz,
         seqGamblePractice,
-        // seqGambleMainTaskBlock1,
-        // seqGambleMainTaskBlock2,
-        // realization,
+        init_camera,
+        calibration_instructions,
+        calibration,
+        validation,
+        seqGambleMainTaskBlock1,
+        recalibration_instructions,
+        calibration,
+        validation,
+        seqGambleMainTaskBlock2,
+        realization,
         debriefing,
       ],
       on_finish: function () {
