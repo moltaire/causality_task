@@ -393,6 +393,17 @@
     seqGambleMainTaskBlock2 = {
       timeline: [
         {
+          type: "html-keyboard-response",
+          stimulus: `
+            <div style="max-width: 800px">
+            <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Main task</h1>
+            <p align="justify">Get ready for the the second half of the task! Please remember to keep your head still, and focus on the red dots between trials. Good luck!</p>
+            <p>Press <strong><em>SPACE BAR</em></strong> to start the last block.</p>
+            </div>`,
+          choices: [" "],
+          post_trial_gap: 2000,
+        },
+        {
           timeline: [withinBlockBreak, fixation, seqGambleChoice],
           timeline_variables: conditions.filter(function (trial) {
             return trial.block == 1;
