@@ -80,6 +80,13 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         default: "White",
         description: "Color of the frame around each gamble stimulus",
       },
+      pieChartRadius: {
+        type: jsPsych.plugins.parameterType.FLOAT,
+        pretty_name: "Pie chart radius, relative to window width.",
+        default: 0.1,
+        description:
+          "The width of the pie charts (and height of the bar charts), expressed in units of window width: A value of 0.1 corresponds to a tenth of the window's width.",
+      },
       timeoutWarningColor: {
         type: jsPsych.plugins.parameterType.STR,
         pretty_name: "Timeout warning color",
@@ -123,6 +130,7 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     var chosenM;
 
     var boxWidthScale = 2; // Size of surrounding box, relative to pie chart diameter
+    var boxHeight = 0.9; // Height of surrounding box, relative to window height
 
     //--------Set up Canvas start-------
     var gambleCanvas = document.createElement("canvas");
@@ -206,16 +214,16 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
       ctx.lineWidth = 2;
       ctx.strokeRect(
         left_xpos - boxWidthScale * radius, // frame top left x-coordinate
-        gambleCanvas.height * 0.1, // frame top left y-coordinate
+        (gambleCanvas.height * (1 - boxHeight)) / 2, // frame top left y-coordinate
         2 * boxWidthScale * radius, // frame width
-        gambleCanvas.height * 0.8 // frame height. Use 2x + height = 1 for symmetric layout
+        gambleCanvas.height * boxHeight // frame height. Use 2x + height = 1 for symmetric layout
       );
       // Right
       ctx.strokeRect(
         right_xpos - boxWidthScale * radius, // frame top left x-coordinate
-        gambleCanvas.height * 0.1, // frame top left y-coordinate
+        (gambleCanvas.height * (1 - boxHeight)) / 2, // frame top left y-coordinate
         2 * boxWidthScale * radius, // frame width
-        gambleCanvas.height * 0.8 // frame height
+        gambleCanvas.height * boxHeight // frame height
       );
 
       // Loop over alternatives and draw everything
@@ -344,9 +352,9 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
       ctx.lineWidth = 5;
       ctx.strokeRect(
         xposFeedback - boxWidthScale * radius, // frame top left x-coordinate
-        gambleCanvas.height * 0.1, // frame top left y-coordinate
+        (gambleCanvas.height * (1 - boxHeight)) / 2, // frame top left y-coordinate
         2 * boxWidthScale * radius, // frame width
-        gambleCanvas.height * 0.8 // frame height
+        gambleCanvas.height * boxHeight // frame height
       );
 
       // Code before the pause
@@ -377,7 +385,7 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     }
 
     // Set up stimulus properties
-    var radius = gambleCanvas.width / 15;
+    var radius = trial.pieChartRadius * gambleCanvas.width;
     var height = 2 * radius;
     var width = (radius * Math.PI) / 2; // This way, the area of the barplot and the pie chart are identical
 
@@ -395,9 +403,9 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     for (alt = 0; alt < 2; alt++) {
       ctx.strokeRect(
         xpos[alt] - boxWidthScale * radius,
-        gambleCanvas.height * 0.1,
+        (gambleCanvas.height * (1 - boxHeight)) / 2,
         2 * boxWidthScale * radius,
-        gambleCanvas.height * 0.8
+        gambleCanvas.height * boxHeight
       );
     }
 
