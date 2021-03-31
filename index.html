@@ -16,8 +16,8 @@
     <script src="js/jspsych-6.3.0/plugins/jspsych-call-function.js"></script>
     <script src="js/jspsych-6.3.0/extensions/jspsych-ext-webgazer.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-webgazer-init-camera.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-webgazer-calibrate.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-webgazer-validate.js"></script>
+    <script src="js/custom_jspsych-plugins/jspsych-webgazer-validate_fm.js"></script>
+    <script src="js/custom_jspsych-plugins/jspsych-webgazer-calibrate_fm.js"></script>
     <script src="js/custom_jspsych-plugins/two-gamble-sequence.js"></script>
     <script src="js/webgazer.js"></script>
 
@@ -48,7 +48,7 @@
     });
 
     debug_nTrialsPerBlock = 2;
-    debug_showValidation = true;
+    debug_showValidation = false;
 
     var preload = {
       type: "preload",
@@ -161,7 +161,6 @@
       stimulus: `
       <div style="max-width: 800px">
       <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Re-Calibration</h1>
-      <p>Great! Now the eye tracker will be calibrated to translate the image of your eyes from the webcam to a location on your screen.
       <p>Good job! We quickly need to re-calibrate the eye tracker.
       <p>Please keep your head still, and focus your gaze on each dot as it appears.</p>
       <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
@@ -171,7 +170,7 @@
     };
 
     var calibration = {
-      type: "webgazer-calibrate",
+      type: "webgazer-calibrate-fm",
       randomize_calibration_order: true,
       calibration_mode: "view",
       point_background_color: "white",
@@ -181,8 +180,21 @@
       on_start: () => (document.body.style.cursor = "none"),
     };
 
+    var validation_instruction = {
+      type: "html-keyboard-response",
+      stimulus: `
+      <div style="max-width: 800px">
+      <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Validation</h1>
+      <p>Good job! To validate the calibration, please focus on the yellow dots now. There won't be a countdown this time.
+      <p>Please keep your head still, and focus your gaze on each dot as it appears.</p>
+      <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
+    `,
+      choices: [" "],
+      post_trial_gap: 1000,
+    };
+
     var validation = {
-      type: "webgazer-validate",
+      type: "webgazer-validate-fm",
       validation_points: [
         [25, 25],
         [25, 75],
@@ -193,7 +205,7 @@
       validation_point_coordinates: "percent",
       randomize_validation_order: true,
       show_validation_data: debug_showValidation,
-      point_background_color: "white",
+      point_background_color: "gold",
       point_size: calibrationPointSize,
       validation_duration: validationPointDuration,
       time_to_saccade: calibrationTimeToSaccade,
@@ -569,17 +581,19 @@
     jsPsych.init({
       timeline: [
         preload,
-        welcomeFullScreen,
+        // welcomeFullScreen,
         init_camera,
-        seqGambleInstruction,
-        seqGambleQuiz,
-        seqGamblePractice,
+        // seqGambleInstruction,
+        // seqGambleQuiz,
+        // seqGamblePractice,
         calibration_instructions,
         calibration,
+        validation_instruction,
         validation,
         seqGambleMainTaskBlock1,
         recalibration_instructions,
         calibration,
+        validation_instruction,
         validation,
         seqGambleMainTaskBlock2,
         realization,
