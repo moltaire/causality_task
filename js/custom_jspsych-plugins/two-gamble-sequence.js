@@ -87,6 +87,16 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         description:
           "The width of the pie charts (and height of the bar charts), expressed in units of window width: A value of 0.1 corresponds to a tenth of the window's width.",
       },
+      boxWidth: {
+        type: jsPsych.plugins.parameterType.FLOAT,
+        pretty_name: "Bounding box width, relative to pieChartRadius.",
+        default: 2,
+      },
+      boxHeight: {
+        type: jsPsych.plugins.parameterType.FLOAT,
+        pretty_name: "Bounding box height, relative to window height.",
+        default: 0.9,
+      },
       timeoutWarningColor: {
         type: jsPsych.plugins.parameterType.STR,
         pretty_name: "Timeout warning color",
@@ -128,9 +138,6 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
     var choice;
     var chosenP;
     var chosenM;
-
-    var boxWidthScale = 2; // Size of surrounding box, relative to pie chart diameter
-    var boxHeight = 0.9; // Height of surrounding box, relative to window height
 
     //--------Set up Canvas start-------
     var gambleCanvas = document.createElement("canvas");
@@ -213,17 +220,17 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
       ctx.strokeStyle = trial.stimFrameColor;
       ctx.lineWidth = 2;
       ctx.strokeRect(
-        left_xpos - boxWidthScale * radius, // frame top left x-coordinate
-        (gambleCanvas.height * (1 - boxHeight)) / 2, // frame top left y-coordinate
-        2 * boxWidthScale * radius, // frame width
-        gambleCanvas.height * boxHeight // frame height. Use 2x + height = 1 for symmetric layout
+        left_xpos - trial.boxWidth * radius, // frame top left x-coordinate
+        (gambleCanvas.height * (1 - trial.boxHeight)) / 2, // frame top left y-coordinate
+        2 * trial.boxWidth * radius, // frame width
+        gambleCanvas.height * trial.boxHeight // frame height. Use 2x + height = 1 for symmetric layout
       );
       // Right
       ctx.strokeRect(
-        right_xpos - boxWidthScale * radius, // frame top left x-coordinate
-        (gambleCanvas.height * (1 - boxHeight)) / 2, // frame top left y-coordinate
-        2 * boxWidthScale * radius, // frame width
-        gambleCanvas.height * boxHeight // frame height
+        right_xpos - trial.boxWidth * radius, // frame top left x-coordinate
+        (gambleCanvas.height * (1 - trial.boxHeight)) / 2, // frame top left y-coordinate
+        2 * trial.boxWidth * radius, // frame width
+        gambleCanvas.height * trial.boxHeight // frame height
       );
 
       // Loop over alternatives and draw everything
@@ -351,10 +358,10 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
       ctx.strokeStyle = trial.feedbackColor;
       ctx.lineWidth = 5;
       ctx.strokeRect(
-        xposFeedback - boxWidthScale * radius, // frame top left x-coordinate
-        (gambleCanvas.height * (1 - boxHeight)) / 2, // frame top left y-coordinate
-        2 * boxWidthScale * radius, // frame width
-        gambleCanvas.height * boxHeight // frame height
+        xposFeedback - trial.boxWidth * radius, // frame top left x-coordinate
+        (gambleCanvas.height * (1 - trial.boxHeight)) / 2, // frame top left y-coordinate
+        2 * trial.boxWidth * radius, // frame width
+        gambleCanvas.height * trial.boxHeight // frame height
       );
 
       // Code before the pause
@@ -402,10 +409,10 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
 
     for (alt = 0; alt < 2; alt++) {
       ctx.strokeRect(
-        xpos[alt] - boxWidthScale * radius,
-        (gambleCanvas.height * (1 - boxHeight)) / 2,
-        2 * boxWidthScale * radius,
-        gambleCanvas.height * boxHeight
+        xpos[alt] - trial.boxWidth * radius,
+        (gambleCanvas.height * (1 - trial.boxHeight)) / 2,
+        2 * trial.boxWidth * radius,
+        gambleCanvas.height * trial.boxHeight
       );
     }
 
@@ -436,57 +443,6 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         end_trial();
       }, trial.choiceTimeout);
     }
-
-    // // Draw stimuli in sequence and prompt choice afterwards
-    // let i = -1;
-    // function presentSequence() {
-    //   i += 1;
-    //   if (i < (trial.sequence.durations.length)) {
-    //     // Clear canvas
-    //     ctx.clearRect(0, 0, gambleCanvas.width, gambleCanvas.height);
-    //     drawStims(i)
-    //     jsPsych.pluginAPI.setTimeout(presentSequence, trial.sequence.durations[i])
-    //   } else {
-    //     // Draw choice prompt
-    //     // Clear canvas
-    //     ctx.clearRect(0, 0, gambleCanvas.width, gambleCanvas.height);
-    //     ctx.font = "60px sans-serif";
-    //     ctx.fillStyle = trial.feedbackColor;
-    //     ctx.textAlign = "center";
-    //     ctx.fillText(
-    //       trial.choicePrompt,
-    //       gambleCanvas.width / 2,
-    //       gambleCanvas.height / 2
-    //     );
-    //     for (alt = 0; alt < 2; alt++) {
-    //       ctx.strokeRect(
-    //         xpos[alt] - boxWidthScale * radius,
-    //         gambleCanvas.height * 0.1,
-    //         2 * boxWidthScale * radius,
-    //         gambleCanvas.height * 0.8
-    //       );
-    //     }
-    //     // start the response listener
-    //     if (trial.choices != jsPsych.NO_KEYS) {
-    //       var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
-    //         callback_function: after_response,
-    //         valid_responses: trial.choices,
-    //         rt_method: "performance",
-    //         persist: false,
-    //         allow_held_key: false,
-    //       });
-    //     }
-
-    //     // end trial if choiceTimeout is set
-    //     if (trial.choiceTimeout !== null) {
-    //       jsPsych.pluginAPI.setTimeout(function () {
-    //         end_trial();
-    //       }, trial.choiceTimeout);
-    //     }
-
-    //   }
-    // }
-    // presentSequence()
   };
 
   return plugin;
