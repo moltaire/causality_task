@@ -30,20 +30,22 @@
     <script src="instructions/instructions.js"></script>
 
     <link rel="stylesheet" href="js/jspsych-6.3.0/css/jspsych.css" />
-    <style>
-      .jspsych-content {
-        max-width: 100%;
-        background-color: #333;
-        color: white;
-      }
-      .jspsych-content-wrapper {
-        background-color: #333;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body></body>
   <script>
+    // capture info from Prolific
+    var subject_id = jsPsych.data.getURLVariable("PROLIFIC_PID");
+    var study_id = jsPsych.data.getURLVariable("STUDY_ID");
+    var session_id = jsPsych.data.getURLVariable("SESSION_ID");
+
+    jsPsych.data.addProperties({
+      subject_id: subject_id,
+      study_id: study_id,
+      session_id: session_id,
+    });
+
     debug_nTrialsPerBlock = 2;
     debug_showValidation = true;
 
@@ -530,7 +532,8 @@
         debriefing,
       ],
       on_finish: function () {
-        window.location = "http://www.fallingfalling.com";
+        window.location =
+          "https://app.prolific.co/submissions/complete?cc=COMPLETIONCODE";
       },
       extensions: [{ type: "webgazer" }],
     });
