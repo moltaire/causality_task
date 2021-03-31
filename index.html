@@ -10,6 +10,7 @@
     <script src="js/jspsych-6.3.0/plugins/jspsych-html-button-response.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-instructions.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-survey-multi-choice.js"></script>
+    <script src="js/jspsych-6.3.0/plugins/jspsych-survey-text.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-fullscreen.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-preload.js"></script>
     <script src="js/jspsych-6.3.0/plugins/jspsych-call-function.js"></script>
@@ -52,6 +53,59 @@
     var preload = {
       type: "preload",
       auto_preload: true,
+    };
+
+    var postExpQuestions = {
+      type: "survey-multi-choice",
+      questions: [
+        {
+          prompt: "Do you have red-green color blindness?",
+          name: "redGreenColorBlind",
+          options: ["yes", "no"],
+          required: true,
+        },
+        {
+          prompt:
+            "Did you have difficulties identifying the red and green portions of the lotteries?",
+          name: "redGreenDifficulties",
+          options: ["yes", "no"],
+          required: true,
+        },
+        {
+          prompt:
+            "To ensure data quality, it would be very helpful if you could tell us whether you have taken part seriously.<br><strong>Your response will not affect your payment or result in any other penalty or loss of benefits.</strong>",
+          name: "seriousness",
+          options: [
+            "I have taken part seriously.",
+            "I have not taken part seriously.",
+          ],
+          required: true,
+        },
+      ],
+      on_start: () => (document.body.style.cursor = "auto"),
+    };
+
+    var postExptSelfReport = {
+      type: "survey-text",
+      questions: [
+        {
+          prompt:
+            "Please briefly describe how you made your choices in the task (one to three sentences or bullet points).",
+          rows: 5,
+          columns: 40,
+          name: "selfReport",
+          required: true,
+        },
+        {
+          prompt:
+            "If you want, you can share comments and thoughts on the study.",
+          rows: 5,
+          columns: 40,
+          name: "comments",
+          required: false,
+        },
+      ],
+      on_start: () => (document.body.style.cursor = "auto"),
     };
 
     /* Welcome and Full Screen */
@@ -516,19 +570,21 @@
       timeline: [
         preload,
         welcomeFullScreen,
-        // init_camera,
+        init_camera,
         seqGambleInstruction,
-        // seqGambleQuiz,
+        seqGambleQuiz,
         seqGamblePractice,
-        // calibration_instructions,
-        // calibration,
-        // validation,
+        calibration_instructions,
+        calibration,
+        validation,
         seqGambleMainTaskBlock1,
         recalibration_instructions,
-        // calibration,
-        // validation,
+        calibration,
+        validation,
         seqGambleMainTaskBlock2,
         realization,
+        postExptSelfReport,
+        postExpQuestions,
         debriefing,
       ],
       on_finish: function () {
