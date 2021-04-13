@@ -4,18 +4,18 @@
     <meta charset="UTF-8" />
 
     <!-- Libraries -->
-    <script src="js/jspsych-6.3.0/jspsych.js"></script>
+    <script src="js/jspsych-6.3.1/jspsych.js"></script>
     <!-- Plugins -->
-    <script src="js/jspsych-6.3.0/plugins/jspsych-html-keyboard-response.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-html-button-response.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-instructions.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-survey-multi-choice.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-survey-text.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-fullscreen.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-preload.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-call-function.js"></script>
-    <script src="js/jspsych-6.3.0/extensions/jspsych-ext-webgazer.js"></script>
-    <script src="js/jspsych-6.3.0/plugins/jspsych-webgazer-init-camera.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-html-button-response.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-instructions.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-survey-multi-choice.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-survey-text.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-fullscreen.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-preload.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-call-function.js"></script>
+    <script src="js/jspsych-6.3.1/extensions/jspsych-ext-webgazer.js"></script>
+    <script src="js/jspsych-6.3.1/plugins/jspsych-webgazer-init-camera.js"></script>
     <script src="js/custom_jspsych-plugins/jspsych-webgazer-validate_fm.js"></script>
     <script src="js/custom_jspsych-plugins/jspsych-webgazer-calibrate_fm.js"></script>
     <script src="js/custom_jspsych-plugins/two-gamble-sequence.js"></script>
@@ -30,7 +30,7 @@
     <!-- Load instruction strings -->
     <script src="instructions/instructions.js"></script>
 
-    <link rel="stylesheet" href="js/jspsych-6.3.0/css/jspsych.css" />
+    <link rel="stylesheet" href="js/jspsych-6.3.1/css/jspsych.css" />
     <link rel="stylesheet" href="style.css" />
   </head>
 
@@ -85,7 +85,7 @@
       on_start: () => (document.body.style.cursor = "auto"),
     };
 
-    var postExptSelfReport = {
+    var postExpSelfReport = {
       type: "survey-text",
       questions: [
         {
@@ -586,14 +586,14 @@
       timeline: [
         preload,
         welcomeFullScreen,
-        // init_camera,
-        // seqGambleInstruction,
-        // seqGambleQuiz,
+        init_camera,
+        seqGambleInstruction,
+        seqGambleQuiz,
         seqGamblePractice,
-        // calibration_instructions,
-        // calibration,
-        // validation_instruction,
-        // validation,
+        calibration_instructions,
+        calibration,
+        validation_instruction,
+        validation,
         seqGambleMainTaskBlock1,
         recalibration_instructions,
         calibration,
@@ -601,7 +601,7 @@
         validation,
         seqGambleMainTaskBlock2,
         realization,
-        postExptSelfReport,
+        postExpSelfReport,
         postExpQuestions,
         debriefing,
       ],
