@@ -372,7 +372,7 @@
             <div style="max-width: 800px">
             <h1><img src="icons/tea-hot_inv.png", width="50"/><br><br>Short break</h1>
             <p>Great job! Take a short break to make sure that you are focused for the next set of trials, but try to keep your head in position.</p>
-            <p>Press the <strong><em>SPACE BAR</em></strong> to continue immediately.</p>
+            <p>Press the <strong><em>SPACE BAR</em></strong> when you are ready to continue.</p>
             </div>`,
           choices: [" "],
           trial_duration: withinBlockBreakDuration,
@@ -501,6 +501,9 @@
             </div>`,
           choices: [" "],
           post_trial_gap: 2000,
+          on_start: function () {
+            trialCounter = 1;
+          },
         },
         {
           timeline: [withinBlockBreak, fixation, seqGambleChoice],
