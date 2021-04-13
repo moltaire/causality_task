@@ -47,6 +47,7 @@
       session_id: session_id,
     });
 
+    debug_logMessages = true;
     debug_nTrialsPerBlock = 2;
     debug_showValidation = true;
 
@@ -329,11 +330,15 @@
           phase: jsPsych.timelineVariable("phase", true),
           condition: jsPsych.timelineVariable("condition", true),
         };
-        console.log("Stimulus:", stim);
+        if (debug_logMessages) {
+          console.log("Stimulus:", stim);
+        }
         return stim;
       },
       sequence: function () {
-        console.log("Sequence:", jsPsych.timelineVariable("sequence", true));
+        if (debug_logMessages) {
+          console.log("Sequence:", jsPsych.timelineVariable("sequence", true));
+        }
         sequence = JSON.parse(jsPsych.timelineVariable("sequence", true));
         return sequence;
       },
@@ -348,7 +353,9 @@
       feedbackColor: feedbackColor,
       on_start: () => (document.body.style.cursor = "none"),
       on_finish: function (data) {
-        console.log("Trial data:", data);
+        if (debug_logMessages) {
+          console.log("Trial data:", data);
+        }
         trialCounter++;
       },
       extensions: [{ type: "webgazer", params: { targets: [] } }],
@@ -522,7 +529,9 @@
               .filter({ phase: "experimental" })
               .values();
             chosenTrial = experimentalTrials[0];
-            console.log("Randomly chosen trial:", chosenTrial);
+            if (debug_logMessages) {
+              console.log("Randomly chosen trial:", chosenTrial);
+            }
             if (chosenTrial.chosenM != undefined) {
               chosenGambleString = `
                 <p align="justify">The computer chose trial number ${
