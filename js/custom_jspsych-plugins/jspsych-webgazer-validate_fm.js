@@ -1,6 +1,8 @@
 /**
  * jspsych-webgazer-validate
  * Josh de Leeuw
+ *
+ * modified by Felix Molter to include countdown and point background and border color
  **/
 
 jsPsych.plugins["webgazer-validate-fm"] = (function () {
@@ -46,7 +48,7 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
       },
       point_size: {
         type: jsPsych.plugins.parameterType.INT,
-        default: 10,
+        default: 20,
       },
       point_background_color: {
         type: jsPsych.plugins.parameterType.STRING,
@@ -68,10 +70,11 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
     trial_data.raw_gaze = [];
     trial_data.percent_in_roi = [];
     trial_data.average_offset = [];
+    trial_data.validation_points = null;
 
     var html = `
-        <div id='webgazer-validate-container' style='position: relative; width:100vw; height:100vh; overflow: hidden;'>
-        </div>`;
+      <div id='webgazer-validate-container' style='position: relative; width:100vw; height:100vh; overflow: hidden;'>
+      </div>`;
 
     display_element.innerHTML = html;
 
@@ -91,8 +94,10 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
       } else {
         val_points = trial.validation_points;
       }
+      trial_data.validation_points = val_points;
       points_completed = -1;
-      jsPsych.extensions["webgazer"].resume();
+      //jsPsych.extensions['webgazer'].resume();
+      jsPsych.extensions.webgazer.startSampleInterval();
       //jsPsych.extensions.webgazer.showPredictions();
       next_validation_point();
     }
@@ -112,7 +117,6 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
       wg_container.innerHTML = pt_html;
 
       var pt_dom = wg_container.querySelector(".validation-point");
-      var countdown_dom = wg_container.querySelector("#validation-countdown");
 
       var br = pt_dom.getBoundingClientRect();
       var x = br.left + br.width / 2;
@@ -122,33 +126,46 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
       var pt_finish = pt_start_val + trial.validation_duration;
 
       var pt_data = [];
+
+      // Countdown: Setup
+      var countdown_dom = wg_container.querySelector("#validation-countdown");
       var countdown_started = false;
 
+      var cancelGazeUpdate = jsPsych.extensions["webgazer"].onGazeUpdate(
+        function (prediction) {
+          if (performance.now() > pt_start_val) {
+            pt_data.push({
+              x: prediction.x,
+              y: prediction.y,
+              dx: prediction.x - x,
+              dy: prediction.y - y,
+              t: Math.round(prediction.t - start),
+            });
+          }
+        }
+      );
+
       requestAnimationFrame(function watch_dot() {
-        if (performance.now() > pt_start_val) {
-          if (!countdown_started) {
+        if (performance.now() < pt_finish) {
+
+          // Countdown: Start timer
+          if (!countdown_started && performance.now() > pt_start_val) {
             countdown_started = true;
             countdown_dom.innerHTML = trial.validation_duration / 1000;
             counter = setInterval(function () {
               countdown_dom.innerHTML = countdown_dom.innerHTML - 1;
             }, 1000);
           }
-          jsPsych.extensions["webgazer"]
-            .getCurrentPrediction()
-            .then(function (prediction) {
-              pt_data.push({
-                dx: prediction.x - x,
-                dy: prediction.y - y,
-                t: Math.round(performance.now() - start),
-              });
-            });
-        }
-        if (performance.now() < pt_finish) {
+
           requestAnimationFrame(watch_dot);
         } else {
           trial_data.raw_gaze.push(pt_data);
+          cancelGazeUpdate();
+
+          // Countdown: Clear counter interval
           clearInterval(counter);
           counter = undefined;
+
           next_validation_point();
         }
       });
@@ -164,7 +181,9 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
     }
 
     function drawValidationPoint_PercentMode(x, y) {
-      return `<div class="validation-point" style="width:${trial.point_size}px; height:${trial.point_size}px; border-radius:${trial.point_size}px; border: 1px solid ${trial.point_border_color}; background-color: ${trial.point_background_color}; position: absolute; left:${x}%; top:${y}%;"><div id="validation-countdown" style="color: ${trial.point_border_color}; line-height:${trial.point_size}px; text-align:center"></div></div>`;
+      return `<div class="validation-point" style="width:${trial.point_size}px; height:${trial.point_size}px; border-radius:${trial.point_size}px; border: 1px solid ${trial.point_border_color}; background-color: ${trial.point_background_color}; position: absolute; left:${x}%; top:${y}%;">
+      <div id="validation-countdown" style="color:${trial.point_border_color}; line-height:${trial.point_size}px; text-align:center"></div>
+      </div>`;
     }
 
     function drawValidationPoint_CenterOffsetMode(x, y) {
@@ -176,11 +195,11 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
         trial.point_background_color
       }; position: absolute; left:calc(50% - ${
         trial.point_size / 2
-      }px + ${x}px); top:calc(50% - ${
-        trial.point_size / 2
-      }px + ${y}px);"><div id="validation-countdown" style="color: ${
+      }px + ${x}px); top:calc(50% - ${trial.point_size / 2}px + ${y}px);">
+      <div id="validation-countdown" style="color:${
         trial.point_border_color
-      }; line-height:${trial.point_size}px; text-align:center"></div></div>`;
+      }; line-height:${trial.point_size}px; text-align:center"></div>
+      </div>`;
     }
 
     function drawCircle(target_x, target_y, dx, dy, r) {
@@ -194,23 +213,23 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
 
     function drawCircle_PercentMode(target_x, target_y, dx, dy, r) {
       var html = `
-          <div class="validation-centroid" style="width:${r * 2}px; height:${
+        <div class="validation-centroid" style="width:${r * 2}px; height:${
         r * 2
       }px; border: 2px dotted #ccc; border-radius: ${r}px; background-color: transparent; position: absolute; left:calc(${target_x}% + ${
         dx - r
       }px); top:calc(${target_y}% + ${dy - r}px);"></div>
-        `;
+      `;
       return html;
     }
 
     function drawCircle_CenterOffsetMode(target_x, target_y, dx, dy, r) {
       var html = `
-          <div class="validation-centroid" style="width:${r * 2}px; height:${
+        <div class="validation-centroid" style="width:${r * 2}px; height:${
         r * 2
       }px; border: 2px dotted #ccc; border-radius: ${r}px; background-color: transparent; position: absolute; left:calc(50% + ${target_x}px + ${
         dx - r
       }px); top:calc(50% + ${target_y}px + ${dy - r}px);"></div>
-        `;
+      `;
       return html;
     }
 
@@ -377,19 +396,25 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
           );
         }
       }
-      // debugging
+
       html +=
         '<button id="cont" style="position:absolute; top: 50%; left:calc(50% - 50px); width: 100px;" class="jspsych-btn">Continue</btn>';
       wg_container.innerHTML = html;
-      wg_container.querySelector("#cont").addEventListener("click", end_trial);
+      wg_container
+        .querySelector("#cont")
+        .addEventListener("click", function () {
+          jsPsych.extensions.webgazer.pause();
+          end_trial();
+        });
+      // turn on webgazer's loop
       jsPsych.extensions.webgazer.showPredictions();
+      jsPsych.extensions.webgazer.stopSampleInterval();
+      jsPsych.extensions.webgazer.resume();
     }
 
     // function to end trial when it is time
     function end_trial() {
-      jsPsych.extensions["webgazer"].pause();
-      jsPsych.extensions["webgazer"].hidePredictions();
-      jsPsych.extensions["webgazer"].hideVideo();
+      jsPsych.extensions.webgazer.stopSampleInterval();
 
       // kill any remaining setTimeout handlers
       jsPsych.pluginAPI.clearAllTimeouts();
