@@ -112,7 +112,7 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
       wg_container.innerHTML = pt_html;
 
       var pt_dom = wg_container.querySelector(".validation-point");
-      // var countdown_dom = wg_container.querySelector("#validation-countdown");
+      var countdown_dom = wg_container.querySelector("#validation-countdown");
 
       var br = pt_dom.getBoundingClientRect();
       var x = br.left + br.width / 2;
@@ -122,17 +122,17 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
       var pt_finish = pt_start_val + trial.validation_duration;
 
       var pt_data = [];
-      // var countdown_started = false;
+      var countdown_started = false;
 
       requestAnimationFrame(function watch_dot() {
         if (performance.now() > pt_start_val) {
-          // if (!countdown_started) {
-          //   countdown_started = true;
-          //   countdown_dom.innerHTML = trial.validation_duration / 1000;
-          //   counter = setInterval(function () {
-          //     countdown_dom.innerHTML = countdown_dom.innerHTML - 1;
-          //   }, 1000);
-          // }
+          if (!countdown_started) {
+            countdown_started = true;
+            countdown_dom.innerHTML = trial.validation_duration / 1000;
+            counter = setInterval(function () {
+              countdown_dom.innerHTML = countdown_dom.innerHTML - 1;
+            }, 1000);
+          }
           jsPsych.extensions["webgazer"]
             .getCurrentPrediction()
             .then(function (prediction) {
@@ -147,8 +147,8 @@ jsPsych.plugins["webgazer-validate-fm"] = (function () {
           requestAnimationFrame(watch_dot);
         } else {
           trial_data.raw_gaze.push(pt_data);
-          // clearInterval(counter);
-          // counter = undefined;
+          clearInterval(counter);
+          counter = undefined;
           next_validation_point();
         }
       });

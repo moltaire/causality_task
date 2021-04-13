@@ -48,7 +48,7 @@
     });
 
     debug_nTrialsPerBlock = 2;
-    debug_showValidation = false;
+    debug_showValidation = true;
 
     var preload = {
       type: "preload",
@@ -197,7 +197,7 @@
       stimulus: `
       <div style="max-width: 800px">
       <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Validation</h1>
-      <p>Good job! To validate the calibration, please focus on the yellow dots now. There won't be a countdown this time.
+      <p>Good job! To validate the calibration, please focus on the yellow dots now.
       <p>Please keep your head still, and focus your gaze on each dot as it appears.</p>
       <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
     `,
@@ -255,7 +255,6 @@
         data.questions = questionSample; // Save questions that were asked
 
         // Count correct responses
-        console.log(data.response);
         var responses = data.response;
         var i;
         for (i = 0; i < questionSample.length; i++) {
@@ -489,7 +488,7 @@
           stimulus: `
             <div style="max-width: 800px">
             <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Main task</h1>
-            <p align="justify">Get ready for the the second half of the task! Please remember to keep your head still, and focus on the red dots between trials. Good luck!</p>
+            <p align="justify">Get ready for the the second half of the task! Please remember to keep your head still, and focus on the crosses between trials. Good luck!</p>
             <p>Press <strong><em>SPACE BAR</em></strong> to start the last block.</p>
             </div>`,
           choices: [" "],
