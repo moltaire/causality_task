@@ -549,7 +549,7 @@
               )}. The computer then played this lottery out and determined the result:</p>`;
               var luckyNumber = Math.random();
               if (luckyNumber < chosenTrial.chosenP) {
-                wonAmt = chosenTrial.chosenP;
+                wonAmt = chosenTrial.chosenM * 10;
                 winString = `<h2 style="color:ForestGreen">Congratulations! You won an additional £${(
                   chosenTrial.chosenM * 10
                 ).toFixed(2)}!</h2>`;
