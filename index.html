@@ -48,9 +48,9 @@
       session_id: session_id,
     });
 
-    debug_logMessages = true;
-    debug_nTrialsPerBlock = 2;
-    debug_showValidation = true;
+    debug_logMessages = false;
+    debug_nTrialsPerBlock = 99;
+    debug_showValidation = false;
 
     var preload = {
       type: "preload",
@@ -606,12 +606,12 @@
     jsPsych.init({
       timeline: [
         preload,
-        // welcome,
+        welcome,
         init_camera,
-        // goFullScreen,
-        // seqGambleInstruction,
-        // seqGambleQuiz,
-        // seqGamblePractice,
+        goFullScreen,
+        seqGambleInstruction,
+        seqGambleQuiz,
+        seqGamblePractice,
         calibration_instructions,
         calibration,
         validation_instruction,
