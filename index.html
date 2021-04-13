@@ -109,8 +109,8 @@
     };
 
     /* Welcome and Full Screen */
-    var welcomeFullScreen = {
-      type: "fullscreen",
+    var welcome = {
+      type: "html-keyboard-response",
       message: `
         <div style="max-width: 800px">
         <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Welcome</h1>
@@ -123,9 +123,9 @@
         <li style="text-align: left;"><strong>close any other browser tabs </strong>that could produce<strong> popups </strong>or<strong> alerts</strong></li>
         <li style="text-align: left;"><strong>mute </strong>your <strong>cell phone</strong> and make sure that it will not distract you</li>
         </ul>
+        <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
         </div>`,
-      fullscreen_mode: true,
-      button_label: "Switch to fullscreen and continue",
+      choices=[' ']
     };
 
     /* Initial Eye tracking setup */
@@ -141,6 +141,18 @@
     `,
       on_start: () => (document.body.style.cursor = "auto"),
     };
+
+    var goFullScreen = {
+      type: "fullscreen",
+      message: `
+        <div style="max-width: 800px">
+        <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Full screen</h1>
+        <p align="justify">The study needs to run in full screen mode. Click the button below to switch to full screen mode. <strong>Please do not leave full screen mode.</strong>
+        </div>`,
+      fullscreen_mode: true,
+      button_label: "Switch to fullscreen and continue",
+    };
+
 
     var calibration_instructions = {
       type: "html-keyboard-response",
@@ -302,7 +314,7 @@
       stimulus: '<p style="font-size:40px;">+</p>',
       choices: jsPsych.NO_KEYS,
       trial_duration: fixationDuration,
-      extensions: [{ type: "webgazer" }],
+      extensions: [{ type: "webgazer" , params={targets: []}}],
       on_start: () => (document.body.style.cursor = "none"),
     };
 
@@ -340,7 +352,7 @@
         console.log("Trial data:", data);
         trialCounter++;
       },
-      extensions: [{ type: "webgazer" }],
+      extensions: [{ type: "webgazer" , params={targets: []}}],
     };
 
     // Break screen procedure (break + get-ready countdown)
@@ -585,8 +597,9 @@
     jsPsych.init({
       timeline: [
         preload,
-        welcomeFullScreen,
+        welcome,
         init_camera,
+        goFullScreen,
         seqGambleInstruction,
         seqGambleQuiz,
         seqGamblePractice,
