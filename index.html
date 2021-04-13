@@ -125,7 +125,7 @@
         </ul>
         <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
         </div>`,
-      choices: [" "]
+      choices: [" "],
     };
 
     /* Initial Eye tracking setup */
@@ -153,7 +153,6 @@
       fullscreen_mode: true,
       button_label: "Switch to fullscreen and continue",
     };
-
 
     var calibration_instructions = {
       type: "html-keyboard-response",
@@ -315,7 +314,7 @@
       stimulus: '<p style="font-size:40px;">+</p>',
       choices: jsPsych.NO_KEYS,
       trial_duration: fixationDuration,
-      extensions: [{ type: "webgazer" , params={targets: []}}],
+      extensions: [{ type: "webgazer", params: { targets: [] } }],
       on_start: () => (document.body.style.cursor = "none"),
     };
 
@@ -353,7 +352,7 @@
         console.log("Trial data:", data);
         trialCounter++;
       },
-      extensions: [{ type: "webgazer" , params={targets: []}}],
+      extensions: [{ type: "webgazer", params: { targets: [] } }],
     };
 
     // Break screen procedure (break + get-ready countdown)
