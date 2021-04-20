@@ -42,58 +42,71 @@ def build_conditions(
     i = 0
     experimental = []
     for alt0, alt1 in pairs:
-        # 2 each alternative targeted once
-        for target in [0, 1]:
-            other = 1 - target
-            # 2 target first, target second
-            for targetFirst in [True, False]:
-                if targetFirst:
-                    durations = [targetDuration, otherDuration] * nPresentationsEach
-                else:
-                    durations = [otherDuration, targetDuration] * nPresentationsEach
+        for alpha in alphas:
+            for gamma in gammas:
+                # Blocks
+                for block in range(nBlocks):
 
-                # 2 alternative-wise or attribute-wise presentation
-                for sequenceKind in ["alternatives", "attributes"]:
-                    if sequenceKind == "alternatives":
-                        attributes = ["all"] * nPresentationsEach * 2
-                        targetId = target
-                        otherId = other
-                        if targetFirst:
-                            alternatives = [target, other] * nPresentationsEach
-                        else:
-                            alternatives = [other, target] * nPresentationsEach
-                    else:
-                        alternatives = ["all"] * nPresentationsEach * 2
-                        targetId = ["p", "m"][target]
-                        otherId = ["p", "m"][other]
-                        if targetFirst:
-                            attributes = [targetId, otherId] * nPresentationsEach
-                        else:
-                            attributes = [otherId, targetId] * nPresentationsEach
-                    sequence = dict(
-                        durations=durations,
-                        alternatives=alternatives,
-                        attributes=attributes,
-                    )
+                    p0 = np.random.uniform(*p_ranges[alt0], size=1)[0]
+                    w0 = W1(p0, gamma)
+                    p1 = np.random.uniform(*p_ranges[alt1], size=1)[0]
+                    w1 = W1(p1, gamma)
+                    e0 = np.random.normal(scale=e_sd)
+                    e1 = np.random.normal(scale=e_sd)
+                    m0 = np.clip((1.0 / w0) ** (U / alpha), m_min, m_max) + e0
+                    m1 = np.clip((1.0 / w1) ** (U / alpha), m_min, m_max) + e1
+                    # 2 each alternative targeted once
+                    for target in [0, 1]:
+                        other = 1 - target
+                        # 2 target first, target second
+                        for targetFirst in [True, False]:
+                            if targetFirst:
+                                durations = [
+                                    targetDuration,
+                                    otherDuration,
+                                ] * nPresentationsEach
+                            else:
+                                durations = [
+                                    otherDuration,
+                                    targetDuration,
+                                ] * nPresentationsEach
 
-                    # Repetitions
-                    for alpha in alphas:
-                        for gamma in gammas:
-                            for block in range(nBlocks):
-                                p0 = np.random.uniform(*p_ranges[alt0], size=1)[0]
-                                w0 = W1(p0, gamma)
-                                p1 = np.random.uniform(*p_ranges[alt1], size=1)[0]
-                                w1 = W1(p1, gamma)
-                                e0 = np.random.normal(scale=e_sd)
-                                e1 = np.random.normal(scale=e_sd)
-                                m0 = (
-                                    np.clip((1.0 / w0) ** (U / alpha), m_min, m_max)
-                                    + e0
+                            # 2 alternative-wise or attribute-wise presentation
+                            for sequenceKind in ["alternatives", "attributes"]:
+                                if sequenceKind == "alternatives":
+                                    attributes = ["all"] * nPresentationsEach * 2
+                                    targetId = target
+                                    otherId = other
+                                    if targetFirst:
+                                        alternatives = [
+                                            target,
+                                            other,
+                                        ] * nPresentationsEach
+                                    else:
+                                        alternatives = [
+                                            other,
+                                            target,
+                                        ] * nPresentationsEach
+                                else:
+                                    alternatives = ["all"] * nPresentationsEach * 2
+                                    targetId = ["p", "m"][target]
+                                    otherId = ["p", "m"][other]
+                                    if targetFirst:
+                                        attributes = [
+                                            targetId,
+                                            otherId,
+                                        ] * nPresentationsEach
+                                    else:
+                                        attributes = [
+                                            otherId,
+                                            targetId,
+                                        ] * nPresentationsEach
+                                sequence = dict(
+                                    durations=durations,
+                                    alternatives=alternatives,
+                                    attributes=attributes,
                                 )
-                                m1 = (
-                                    np.clip((1.0 / w1) ** (U / alpha), m_min, m_max)
-                                    + e1
-                                )
+
                                 condition = pd.DataFrame(
                                     dict(
                                         block=block,
@@ -148,7 +161,7 @@ def build_conditions(
                             alternatives=[0, 1] * nPresentationsEach,
                         )
                     ),
-                    # Attribute-wise sequece
+                    # Attribute-wise sequence
                     json.dumps(
                         dict(
                             durations=[fillerDuration] * 2 * nPresentationsEach,
