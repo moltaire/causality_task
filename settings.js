@@ -1,6 +1,7 @@
 // Experiment settings
 const fixationDuration = 500; // this is in ms
 const withinBlockBreakDuration = 30 * 1000; // in ms, too
+const betweenBlockBreakDuration = 50 * 1000; // in ms, too
 const getReadyDuration = 5 * 1000;
 const countdownDuration = 3 * 1000;
 const breakAfter = 41; // how many trials until a break is shown

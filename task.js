@@ -1,6 +1,7 @@
 // Experiment settings
 const fixationDuration = 500; // this is in ms
 const withinBlockBreakDuration = 30 * 1000; // in ms, too
+const betweenBlockBreakDuration = 50 * 1000; // in ms, too
 const getReadyDuration = 5 * 1000;
 const countdownDuration = 3 * 1000;
 const breakAfter = 41; // how many trials until a break is shown
@@ -12,6 +13,11 @@ const stimFrameColor = "#DDD";
 var timeline = [];
 var trialCounter = 1;
 var repeatPractice = false;
+
+// Debugging
+debug_logMessages = false; // false
+debug_nTrialsPerBlock = 82; // 82 (72 exp + 10 catch)
+debug_showValidation = false; // false
 
 // Eye tracking parameters
 calibrationPointSize = 30;
@@ -84,7 +90,6 @@ var questions = [
     `,
   },
 ];
-
 
 // Draw random questions from the question pool
 questionSample = jsPsych.randomization.sampleWithoutReplacement(
@@ -177,7 +182,6 @@ In other trials, the lotteries' attributes are presented sequentially. For examp
 `,
 ];
 
-
 // capture info from Prolific
 var subject_id = jsPsych.data.getURLVariable("PROLIFIC_PID");
 var study_id = jsPsych.data.getURLVariable("STUDY_ID");
@@ -188,10 +192,6 @@ jsPsych.data.addProperties({
   study_id: study_id,
   session_id: session_id,
 });
-
-debug_logMessages = false;
-debug_nTrialsPerBlock = 99;
-debug_showValidation = false;
 
 var preload = {
   type: "preload",
@@ -315,7 +315,7 @@ var recalibration_instructions = {
   stimulus: `
       <div style="max-width: 800px">
       <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Re-Calibration</h1>
-      <p>Good job! We quickly need to re-calibrate the eye tracker.
+      <p>We quickly need to re-calibrate the eye tracker.
       <p>Please keep your head still, and focus your gaze on each dot as it appears.</p>
       <p>Press <strong><em>SPACE BAR</em></strong> to start.</p>
     `,
@@ -325,6 +325,21 @@ var recalibration_instructions = {
 
 var calibration = {
   type: "webgazer-calibrate-fm",
+  calibration_points: [
+    [10, 10],
+    [10, 50],
+    [10, 90],
+    [50, 10],
+    [25, 25],
+    [25, 75],
+    [75, 25],
+    [75, 75],
+    [50, 50],
+    [50, 90],
+    [90, 10],
+    [90, 50],
+    [90, 90],
+  ],
   randomize_calibration_order: true,
   calibration_mode: "view",
   point_background_color: "white",
@@ -628,6 +643,53 @@ seqGambleMainTaskBlock1 = {
   ],
 };
 
+var betweenBlocksBreak = {
+  timeline: [
+    {
+      type: "html-keyboard-response",
+      on_start: () => (document.body.style.cursor = "none"),
+      stimulus: `
+            <div style="max-width: 800px">
+            <h1><img src="icons/tea-hot_inv.png", width="50"/><br><br>Short break</h1>
+            <p>Great job! You have completed the first half of the task. Take a short break to make sure that you are focused for the second half of trials. You can move your head during this break, but try to return it into position before continuing.</p>
+            <p>Press the <strong><em>SPACE BAR</em></strong> when you are ready to continue.</p>
+            </div>`,
+      choices: [" "],
+      trial_duration: betweenBlockBreakDuration,
+    },
+    {
+      type: "call-function",
+      func: function () {
+        start_time = Date.now();
+        timer_ticks = setInterval(function () {
+          var time_elapsed = Math.floor(Date.now() - start_time);
+          var time_remaining = getReadyDuration - time_elapsed;
+          if (time_remaining <= countdownDuration) {
+            document.querySelector("#timer").innerHTML = `${Math.floor(
+              time_remaining / 1000 + 1
+            )}`;
+            document.querySelector("#timer").style.color = "orangered";
+          }
+        }, 1000);
+      },
+    },
+    {
+      type: "html-keyboard-response",
+      on_start: () => (document.body.style.cursor = "none"),
+      stimulus: `
+            <div style="max-width: 800px">
+            <h1><img src="icons/timer_inv.png", width="50"/><br><br><span id="timer">Get ready!</span></h1>
+            </div>`,
+      choices: null,
+      trial_duration: getReadyDuration,
+      on_finish: function () {
+        clearInterval(timer_ticks);
+      },
+      post_trial_gap: 2000,
+    },
+  ],
+};
+
 seqGambleMainTaskBlock2 = {
   timeline: [
     {
@@ -759,6 +821,7 @@ jsPsych.init({
     validation_instruction,
     validation,
     seqGambleMainTaskBlock1,
+    betweenBlocksBreak,
     recalibration_instructions,
     calibration,
     validation_instruction,
@@ -771,7 +834,7 @@ jsPsych.init({
   ],
   on_finish: function () {
     window.location =
-      "https://app.prolific.co/submissions/complete?cc=COMPLETIONCODE";
+      "https://app.prolific.co/submissions/complete?cc=6FC402DB";
   },
   extensions: [{ type: "webgazer" }],
 });
