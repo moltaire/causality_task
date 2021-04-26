@@ -23,7 +23,7 @@
     <script src="js/webgazer/webgazer.js"></script>
 
     <!-- Load stimulus file -->
-    <script src="stimuli/conditions.js"></script>
+    <script src="stimuli/conditions_pilot2.js"></script>
     <script src="stimuli/practice.js"></script>
     <script src="stimuli/quiz.js"></script>
     <!-- Load experiment settings -->
@@ -46,6 +46,8 @@
       subject_id: subject_id,
       study_id: study_id,
       session_id: session_id,
+      screen_width: screen.width,
+      screen_height: screen.height,
     });
 
     debug_logMessages = false;
@@ -424,7 +426,7 @@
         },
       ],
       conditional_function: function () {
-        if (trialCounter == breakAfter) {
+        if ((trialCounter > 1) & ((trialCounter - 1) % breakAfter == 0)) {
           return true;
         } else {
           return false;
@@ -672,21 +674,21 @@
       timeline: [
         preload,
         welcome,
-        init_camera,
+        // init_camera,
         goFullScreen,
-        seqGambleInstruction,
-        seqGambleQuiz,
-        seqGamblePractice,
-        calibration_instructions,
-        calibration,
-        validation_instruction,
-        validation,
+        // seqGambleInstruction,
+        // seqGambleQuiz,
+        // seqGamblePractice,
+        // calibration_instructions,
+        // calibration,
+        // validation_instruction,
+        // validation,
         seqGambleMainTaskBlock1,
         betweenBlocksBreak,
         recalibration_instructions,
-        calibration,
-        validation_instruction,
-        validation,
+        // calibration,
+        // validation_instruction,
+        // validation,
         seqGambleMainTaskBlock2,
         realization,
         postExpSelfReport,

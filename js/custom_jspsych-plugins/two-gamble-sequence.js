@@ -303,6 +303,8 @@ jsPsych.plugins["two-gamble-sequence"] = (function () {
         choice: choice,
         chosenP: chosenP,
         chosenM: chosenM,
+        vpWidth: visualViewport.width,
+        vpHeight: visualViewport.height,
       };
 
       if (response.key == null && trial.showTimeoutWarning) {

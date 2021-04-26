@@ -4,7 +4,7 @@ const withinBlockBreakDuration = 30 * 1000; // in ms, too
 const betweenBlockBreakDuration = 50 * 1000; // in ms, too
 const getReadyDuration = 5 * 1000;
 const countdownDuration = 3 * 1000;
-const breakAfter = 41; // how many trials until a break is shown
+var breakAfter = 35; // 140 trials / 4
 const choiceTimeout = 3000;
 const feedbackColor = "Gold";
 const stimBackgroundColor = "DarkRed";
@@ -191,6 +191,8 @@ jsPsych.data.addProperties({
   subject_id: subject_id,
   study_id: study_id,
   session_id: session_id,
+  screen_width: screen.width,
+  screen_height: screen.height,
 });
 
 var preload = {
@@ -563,7 +565,7 @@ var withinBlockBreak = {
     },
   ],
   conditional_function: function () {
-    if (trialCounter == breakAfter) {
+    if ((trialCounter > 1) & ((trialCounter - 1) % breakAfter == 0)) {
       return true;
     } else {
       return false;
