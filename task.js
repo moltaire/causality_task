@@ -16,7 +16,7 @@ var repeatPractice = false;
 
 // Debugging
 debug_logMessages = false; // false
-debug_nTrialsPerBlock = 82; // 82 (72 exp + 10 catch)
+debug_nTrialsPerBlock = 70; // 70 (60 exp + 10 catch)
 debug_showValidation = false; // false
 
 // Eye tracking parameters
@@ -103,7 +103,7 @@ taskInstructions = [
 <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Decision-making task</h1><h2>Lotteries</h2>
 <p align="justify">
 In this study, you will make choices between two risky lotteries.
-Each lottery describes the prospect to win an amount between £0.1 and £10 with some probability.
+Each lottery describes the prospect to win an amount between £1 and £10 with some probability.
 
 <p align='center'><img height="400px" src="img/single-lottery.png"></p>
 
@@ -145,7 +145,7 @@ Information over the two lotteries is shown to you in a <strong>rapid sequential
 <p align="center">
 ... until you are prompted to make a choice. <strong>You then have ${
     choiceTimeout / 1000
-  } seconds</strong> to make a choice using the keyboard.</p>
+  } seconds</strong> to make a choice using the keyboard, with the <strong>F</strong> and <strong>J</strong> keys.</p>
   <p>Press the <strong><em>SPACE BAR</em></strong> to continue or <strong><em>B</em></strong> to go back.</p>
 </div>`,
   // Page 6: Sequential presentation attribute-wise I
@@ -177,7 +177,7 @@ In other trials, the lotteries' attributes are presented sequentially. For examp
   `<div style="max-width: 800px">
 <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Decision-making task</h1><h2>Bonus payment</h2>
 <p align='center'><img height="400px" src="img/realization.png"></p>
-<p align="justify">After you completed a total of 164 choice trials (with multiple breaks in between), the computer will randomly determine one of the lotteries you chose and play it out – according to its winning probability and amount – as a <strong>bonus payment</strong>. Treat every choice as if it was used to determine your bonus payment!</p>
+<p align="justify">After you completed a total of 140 choice trials (with multiple breaks in between), the computer will randomly determine one of the lotteries you chose and play it out – according to its winning probability and amount – as a <strong>bonus payment</strong>. Treat every choice as if it was used to determine your bonus payment!</p>
 <p>Press the <strong><em>SPACE BAR</em></strong> to practice the task or <strong><em>B</em></strong> to go back.</p>
 `,
 ];
@@ -188,6 +188,7 @@ var study_id = jsPsych.data.getURLVariable("STUDY_ID");
 var session_id = jsPsych.data.getURLVariable("SESSION_ID");
 
 jsPsych.data.addProperties({
+  task_version: "pilot2b",
   subject_id: subject_id,
   study_id: study_id,
   session_id: session_id,
@@ -260,7 +261,7 @@ var welcome = {
         <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Welcome</h1>
         <p align="justify">Thank you for choosing to participate in this study. Our aim is to better understand how people make decisions.<br>
         We are also interested in people's looking behaviour during decision making, therefore this study includes <strong>webcam-based eye tracking</strong>. Please <strong>allow this page to access your webcam, when prompted</strong>. Your video feed is processed locally and is not transmitted.
-        The study will take less than 30 minutes to complete. Please assure that you can be focused and undisturbed for this time.
+        The study will take around 30 minutes to complete. Please assure that you can be focused and undisturbed for this time.
         To make sure the study runs smoothly, please</p>
         <ul>
         <li style="text-align: left;"><strong>close any unnecessary programs</strong></li>
@@ -278,7 +279,7 @@ var init_camera = {
   instructions: `
       <div style="max-width: 800px">
       <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Camera Setup</h1>
-      <p align="justify">Position your head so that the webcam has a good view of your eyes. Use the video in the upper-left corner as a guide. Center your face in the box and look directly towards the camera. The blue dot mask should be stable and flush on your mouth and eyes.
+      <p align="justify">Position your head so that the webcam has a good view of your eyes. Use the video above as a guide. Center your face in the box and look directly towards the camera. The blue dot mask should be stable and flush on your mouth and eyes.
       <p align='center'><strong>It is important that you try and keep your head reasonably still throughout the experiment, so please take a moment to adjust your setup as needed. Use these tips to achieve a good camera setup:</strong></p>
       <img width="700px" src="img/camera-setup-tips.png">
       <p>When your face is centered in the box and the box turns green, you can click to continue.</p>
@@ -488,6 +489,7 @@ var seqGambleChoice = {
       condition: jsPsych.timelineVariable("condition", true),
     };
     if (debug_logMessages) {
+      console.log("Trial counter:", trialCounter);
       console.log("Stimulus:", stim);
     }
     return stim;
@@ -580,11 +582,11 @@ seqGamblePractice = {
       stimulus: `
             <div style="max-width: 800px">
             <h1><img src="icons/target_inv.png", width="50"/><br><br>Practice</h1>
-            <p align="justify">Now you will perform a couple of practice trials that look just like the ones in the main task, but don't count for the possible bonus winning. Practice trials will start with a slower presentation, and gradually become faster.</p>
-            Press the <strong>F</strong> key to choose the left gamble and the <strong>J</strong> key to choose the right gamble.<br>
+            <p align="justify">Now you will perform a couple of practice trials that look just like the ones in the main task, but don't count for the possible bonus winning. Practice trials will start with a slower presentation, and gradually become as fast as in the main task.</p>
+            Press the <strong>F</strong> key to choose the left lottery and the <strong>J</strong> key to choose the right lottery.<br>
             Place your fingers on these keys now.</p>
             <p>Please re-center your gaze on the "<strong>+</strong>" between trials.</p>
-            <p><strong>Note, that this task is designed to be very fast-paced and difficult. Try not to be discouraged by this, but focus and attempt to do your best!</strong>
+            <h3 style='color:gold'>Note, that this task is designed to be very fast-paced and difficult. Try not to be discouraged by this, but focus and attempt to do your best!<\h3>
             <p>Press <strong><em>SPACE BAR</em></strong> to start practice.</p>
             </div>`,
       choices: [" "],
@@ -630,6 +632,9 @@ seqGambleMainTaskBlock1 = {
             </div>`,
       choices: [" "],
       post_trial_gap: 2000,
+      on_start: function () {
+        trialCounter = 1;
+      },
     },
     {
       timeline: [withinBlockBreak, fixation, seqGambleChoice],
