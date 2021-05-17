@@ -199,6 +199,26 @@ jsPsych.data.addProperties({
 var preload = {
   type: "preload",
   auto_preload: true,
+  images: [
+    "img/camera-setup-tips.png",
+    "img/realization.png",
+    "img/seq-left.png",
+    "img/seq-right.png",
+    "img/two-lotteries.png",
+    "img/choiceprompt.png",
+    "img/seq-amounts.png",
+    "img/seq-probabilities.png",
+    "img/single-lottery.png",
+    "icons/answer-wrong_inv.png",
+    "icons/eye-scanning_inv.png",
+    "icons/race_inv.png",
+    "icons/tea-hot_inv.png",
+    "icons/wheel-of-fortune_inv.png",
+    "icons/arrows-up_inv.png",
+    "icons/how-to_inv.png",
+    "icons/target_inv.png",
+    "icons/timer_inv.png",
+  ],
 };
 
 var postExpQuestions = {
