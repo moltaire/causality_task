@@ -53,6 +53,23 @@
       screen_height: screen.height,
     });
 
+    // Counterbalance order of blocks (CONDITION is set by cognition.run to 1 or 2)
+    if (CONDITION == 1) {
+      conditions_block_1 = conditions.filter(function (trial) {
+        return trial.block == 0;
+      });
+      conditions_block_2 = conditions.filter(function (trial) {
+        return trial.block == 1;
+      });
+    } else {
+      conditions_block_1 = conditions.filter(function (trial) {
+        return trial.block == 1;
+      });
+      conditions_block_2 = conditions.filter(function (trial) {
+        return trial.block == 0;
+      });
+    }
+
     // Draw random questions from the question pool
     questionSample = jsPsych.randomization.sampleWithoutReplacement(
       questions,
@@ -538,9 +555,7 @@
         },
         {
           timeline: [withinBlockBreak, fixation, seqGambleChoice],
-          timeline_variables: conditions.filter(function (trial) {
-            return trial.block == 0;
-          }),
+          timeline_variables: conditions_block_1,
           randomize_order: true,
           sample: {
             type: "without-replacement",
@@ -615,9 +630,7 @@
         },
         {
           timeline: [withinBlockBreak, fixation, seqGambleChoice],
-          timeline_variables: conditions.filter(function (trial) {
-            return trial.block == 1;
-          }),
+          timeline_variables: conditions_block_2,
           randomize_order: true,
           sample: {
             type: "without-replacement",

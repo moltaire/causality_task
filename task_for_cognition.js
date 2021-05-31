@@ -205,6 +205,23 @@ jsPsych.data.addProperties({
   screen_height: screen.height,
 });
 
+// Counterbalance order of blocks (CONDITION is set by cognition.run to 1 or 2)
+if (CONDITION == 1) {
+  conditions_block_1 = conditions.filter(function (trial) {
+    return trial.block == 0;
+  });
+  conditions_block_2 = conditions.filter(function (trial) {
+    return trial.block == 1;
+  });
+} else {
+  conditions_block_1 = conditions.filter(function (trial) {
+    return trial.block == 1;
+  });
+  conditions_block_2 = conditions.filter(function (trial) {
+    return trial.block == 0;
+  });
+}
+
 // Preload images
 var preload = {
   type: "preload",
