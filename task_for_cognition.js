@@ -1,4 +1,8 @@
+// Content from settings.js
 // Experiment settings
+const COMPLETION_CODE = "COMPLETIONCODE"; // This has to be changed to the real completion code of the Prolific study
+const TASK_VERSION = "main";
+
 const fixationDuration = 500; // this is in ms
 const withinBlockBreakDuration = 30 * 1000; // in ms, too
 const betweenBlockBreakDuration = 50 * 1000; // in ms, too
@@ -14,16 +18,16 @@ var timeline = [];
 var trialCounter = 1;
 var repeatPractice = false;
 
-// Debugging
-debug_logMessages = false; // false
-debug_nTrialsPerBlock = 70; // 70 (60 exp + 10 catch)
-debug_showValidation = false; // false
+// Debugging parameters
+const debug_logMessages = false; // false
+const debug_nTrialsPerBlock = 70; // 70 (60 exp + 10 catch)
+const debug_showValidation = false; // false
 
 // Eye tracking parameters
-calibrationPointSize = 30;
-calibrationPointDuration = 3000;
-calibrationTimeToSaccade = 1000;
-validationPointDuration = 3000;
+const calibrationPointSize = 30;
+const calibrationPointDuration = 3000;
+const calibrationTimeToSaccade = 1000;
+const validationPointDuration = 3000;
 
 // Quiz parameters
 var nQuestions = 3; // How many questions from the pool to ask
@@ -32,6 +36,10 @@ var nCorrect = 0;
 var reminder_pages = [];
 var questionSample = [];
 
+// conditions are loaded from separate .js file
+// practice trials are loaded from separate .js file
+
+// Content of quiz.js
 // Define the question pool
 // Each question has a prompt, multiple options, a correct answer, and reminder text that is shown if it is not answered correctly.
 var questions = [
@@ -97,6 +105,7 @@ questionSample = jsPsych.randomization.sampleWithoutReplacement(
   nQuestions
 );
 
+// Content from instructions.js
 taskInstructions = [
   // Page 1: What is a lottery?
   `<div style="max-width: 800px">
@@ -188,7 +197,7 @@ var study_id = jsPsych.data.getURLVariable("STUDY_ID");
 var session_id = jsPsych.data.getURLVariable("SESSION_ID");
 
 jsPsych.data.addProperties({
-  task_version: "pilot2b",
+  task_version: TASK_VERSION,
   subject_id: subject_id,
   study_id: study_id,
   session_id: session_id,
@@ -196,6 +205,7 @@ jsPsych.data.addProperties({
   screen_height: screen.height,
 });
 
+// Preload images
 var preload = {
   type: "preload",
   auto_preload: true,
@@ -221,9 +231,16 @@ var preload = {
   ],
 };
 
+// Define post-experiment questions
 var postExpQuestions = {
   type: "survey-multi-choice",
   questions: [
+    {
+      prompt: "Choose your gender.",
+      name: "gender",
+      options: ["Female", "Male", "Other", "Prefer not to say"],
+      required: true,
+    },
     {
       prompt: "Do you have red-green color blindness?",
       name: "redGreenColorBlind",
@@ -254,6 +271,13 @@ var postExpQuestions = {
 var postExpSelfReport = {
   type: "survey-text",
   questions: [
+    {
+      prompt: "Enter your age (in years)",
+      rows: 1,
+      columns: 3,
+      name: "age",
+      required: true,
+    },
     {
       prompt:
         "Please briefly describe how you made your choices in the task.<br>(One to three sentences or bullet points)",
@@ -606,7 +630,7 @@ seqGamblePractice = {
             Press the <strong>F</strong> key to choose the left lottery and the <strong>J</strong> key to choose the right lottery.<br>
             Place your fingers on these keys now.</p>
             <p>Please re-center your gaze on the "<strong>+</strong>" between trials.</p>
-            <h3 style='color:gold'>Note, that this task is designed to be very fast-paced and difficult. Try not to be discouraged by this, but focus and attempt to do your best!<\h3>
+            <h3 style='color:gold'>Note that this task is designed to be very fast-paced and difficult. Try not to be discouraged by this, but focus and attempt to do your best!<\h3>
             <p>Press <strong><em>SPACE BAR</em></strong> to start practice.</p>
             </div>`,
       choices: [" "],
@@ -861,7 +885,7 @@ jsPsych.init({
   ],
   on_finish: function () {
     window.location =
-      "https://app.prolific.co/submissions/complete?cc=6FC402DB";
+      "https://app.prolific.co/submissions/complete?cc=" + COMPLETION_CODE;
   },
   extensions: [{ type: "webgazer" }],
 });

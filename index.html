@@ -22,12 +22,14 @@
     <script src="js/custom_jspsych-plugins/two-gamble-sequence.js"></script>
     <script src="js/webgazer/webgazer.js"></script>
 
+    <!-- Load experiment settings -->
+    <script src="settings.js"></script>
+
     <!-- Load stimulus file -->
     <script src="stimuli/conditions_pilot2.js"></script>
     <script src="stimuli/practice.js"></script>
     <script src="stimuli/quiz.js"></script>
-    <!-- Load experiment settings -->
-    <script src="settings.js"></script>
+
     <!-- Load instruction strings -->
     <script src="instructions/instructions.js"></script>
 
@@ -43,7 +45,7 @@
     var session_id = jsPsych.data.getURLVariable("SESSION_ID");
 
     jsPsych.data.addProperties({
-      task_version: "pilot2",
+      task_version: TASK_VERSION,
       subject_id: subject_id,
       study_id: study_id,
       session_id: session_id,
@@ -51,18 +53,48 @@
       screen_height: screen.height,
     });
 
-    debug_logMessages = false;
-    debug_nTrialsPerBlock = 99;
-    debug_showValidation = false;
+    // Draw random questions from the question pool
+    questionSample = jsPsych.randomization.sampleWithoutReplacement(
+      questions,
+      nQuestions
+    );
 
+    // Preload images
     var preload = {
       type: "preload",
       auto_preload: true,
+      images: [
+        "img/camera-setup-tips.png",
+        "img/realization.png",
+        "img/seq-left.png",
+        "img/seq-right.png",
+        "img/two-lotteries.png",
+        "img/choiceprompt.png",
+        "img/seq-amounts.png",
+        "img/seq-probabilities.png",
+        "img/single-lottery.png",
+        "icons/answer-wrong_inv.png",
+        "icons/eye-scanning_inv.png",
+        "icons/race_inv.png",
+        "icons/tea-hot_inv.png",
+        "icons/wheel-of-fortune_inv.png",
+        "icons/arrows-up_inv.png",
+        "icons/how-to_inv.png",
+        "icons/target_inv.png",
+        "icons/timer_inv.png",
+      ],
     };
 
+    // Define post-experiment questions
     var postExpQuestions = {
       type: "survey-multi-choice",
       questions: [
+        {
+          prompt: "Choose your gender.",
+          name: "gender",
+          options: ["Female", "Male", "Other", "Prefer not to say"],
+          required: true,
+        },
         {
           prompt: "Do you have red-green color blindness?",
           name: "redGreenColorBlind",
@@ -94,6 +126,13 @@
       type: "survey-text",
       questions: [
         {
+          prompt: "Enter your age (in years)",
+          rows: 1,
+          columns: 3,
+          name: "age",
+          required: true,
+        },
+        {
           prompt:
             "Please briefly describe how you made your choices in the task.<br>(One to three sentences or bullet points)",
           rows: 5,
@@ -121,7 +160,7 @@
         <h1><img src="icons/arrows-up_inv.png", width="50"/><br><br>Welcome</h1>
         <p align="justify">Thank you for choosing to participate in this study. Our aim is to better understand how people make decisions.<br>
         We are also interested in people's looking behaviour during decision making, therefore this study includes <strong>webcam-based eye tracking</strong>. Please <strong>allow this page to access your webcam, when prompted</strong>. Your video feed is processed locally and is not transmitted.
-        The study will take less than 30 minutes to complete. Please assure that you can be focused and undisturbed for this time.
+        The study will take around 30 minutes to complete. Please assure that you can be focused and undisturbed for this time.
         To make sure the study runs smoothly, please</p>
         <ul>
         <li style="text-align: left;"><strong>close any unnecessary programs</strong></li>
@@ -139,7 +178,7 @@
       instructions: `
       <div style="max-width: 800px">
       <h1><img src="icons/eye-scanning_inv.png", width="50"/><br><br>Camera Setup</h1>
-      <p align="justify">Position your head so that the webcam has a good view of your eyes. Use the video in the upper-left corner as a guide. Center your face in the box and look directly towards the camera. The blue dot mask should be stable and flush on your mouth and eyes.
+      <p align="justify">Position your head so that the webcam has a good view of your eyes. Use the video above as a guide. Center your face in the box and look directly towards the camera. The blue dot mask should be stable and flush on your mouth and eyes.
       <p align='center'><strong>It is important that you try and keep your head reasonably still throughout the experiment, so please take a moment to adjust your setup as needed. Use these tips to achieve a good camera setup:</strong></p>
       <img width="700px" src="img/camera-setup-tips.png">
       <p>When your face is centered in the box and the box turns green, you can click to continue.</p>
@@ -350,6 +389,7 @@
           condition: jsPsych.timelineVariable("condition", true),
         };
         if (debug_logMessages) {
+          console.log("Trial counter:", trialCounter);
           console.log("Stimulus:", stim);
         }
         return stim;
@@ -442,11 +482,11 @@
           stimulus: `
             <div style="max-width: 800px">
             <h1><img src="icons/target_inv.png", width="50"/><br><br>Practice</h1>
-            <p align="justify">Now you will perform a couple of practice trials that look just like the ones in the main task, but don't count for the possible bonus winning. Practice trials will start with a slower presentation, and gradually become faster.</p>
-            Press the <strong>F</strong> key to choose the left gamble and the <strong>J</strong> key to choose the right gamble.<br>
+            <p align="justify">Now you will perform a couple of practice trials that look just like the ones in the main task, but don't count for the possible bonus winning. Practice trials will start with a slower presentation, and gradually become as fast as in the main task.</p>
+            Press the <strong>F</strong> key to choose the left lottery and the <strong>J</strong> key to choose the right lottery.<br>
             Place your fingers on these keys now.</p>
             <p>Please re-center your gaze on the "<strong>+</strong>" between trials.</p>
-            <p><strong>Note, that this task is designed to be very fast-paced and difficult. Try not to be discouraged by this, but focus and attempt to do your best!</strong>
+            <h3 style='color:gold'>Note that this task is designed to be very fast-paced and difficult. Try not to be discouraged by this, but focus and attempt to do your best!<\h3>
             <p>Press <strong><em>SPACE BAR</em></strong> to start practice.</p>
             </div>`,
           choices: [" "],
@@ -492,6 +532,9 @@
             </div>`,
           choices: [" "],
           post_trial_gap: 2000,
+          on_start: function () {
+            trialCounter = 1;
+          },
         },
         {
           timeline: [withinBlockBreak, fixation, seqGambleChoice],
@@ -675,21 +718,21 @@
       timeline: [
         preload,
         welcome,
-        // init_camera,
+        init_camera,
         goFullScreen,
         seqGambleInstruction,
         seqGambleQuiz,
         seqGamblePractice,
-        // calibration_instructions,
-        // calibration,
-        // validation_instruction,
-        // validation,
+        calibration_instructions,
+        calibration,
+        validation_instruction,
+        validation,
         seqGambleMainTaskBlock1,
         betweenBlocksBreak,
         recalibration_instructions,
-        // calibration,
-        // validation_instruction,
-        // validation,
+        calibration,
+        validation_instruction,
+        validation,
         seqGambleMainTaskBlock2,
         realization,
         postExpSelfReport,
@@ -698,7 +741,7 @@
       ],
       on_finish: function () {
         window.location =
-          "https://app.prolific.co/submissions/complete?cc=COMPLETIONCODE";
+          "https://app.prolific.co/submissions/complete?cc=" + COMPLETION_CODE;
       },
       extensions: [{ type: "webgazer" }],
     });
